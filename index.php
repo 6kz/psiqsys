@@ -9,44 +9,41 @@ if (isset($_POST["btnIniciarSessao"])) {
   $password = trim($_POST["password"] ?? '');
 
   $stmt = $pdo->prepare("
-        SELECT * 
-        FROM utilizadores 
-        WHERE login = :login 
-        AND password = :password
+        SELECT 
+            u.id_utilizador,
+            u.username,
+            u.password_hash,
+            u.ativo,
+            p.nome,
+            p.funcao
+        FROM UTILIZADOR u
+        JOIN PROFISSIONAL p ON p.id_profissional = u.id_profissional
+        WHERE u.username = :login
+          AND u.ativo = 1
         LIMIT 1
     ");
 
   $stmt->execute([
-    ':login' => $login,
-    ':password' => $password
+    ':login' => $login
   ]);
 
   $linha = $stmt->fetch();
 
-  if (!$linha) {
+  if (!$linha || !password_verify($password, $linha["password_hash"])) {
     $erro = "Utilizador e/ou palavra-passe inválidos.";
   } else {
-    $_SESSION['currentNome'] = $linha["nome"];
+    session_regenerate_id(true);
+
     $_SESSION['currentID'] = $linha["id_utilizador"];
-    $_SESSION['currentLogin'] = $linha["login"];
-    $_SESSION['currentFoto'] = $linha["foto"];
-    $_SESSION['erro'] = 1;
+    $_SESSION['currentNome'] = $linha["nome"];
+    $_SESSION['currentLogin'] = $linha["username"];
+    $_SESSION['currentFuncao'] = $linha["funcao"];
 
-    $stmtUpdate = $pdo->prepare("
-            UPDATE utilizadores 
-            SET data = :data 
-            WHERE id_utilizador = :id
-        ");
-
-    $stmtUpdate->execute([
-      ':data' => date("Y-m-d H:i:s"),
-      ':id' => $linha["id_utilizador"]
-    ]);
-
-    header('Location: backoffice.php');
+    header('Location: dashboard.php');
     exit;
   }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -72,6 +69,7 @@ if (isset($_POST["btnIniciarSessao"])) {
         <div class="login-logo">
           <i class="ti ti-brain"></i>
         </div>
+
         <div>
           <h1>PsiqSys</h1>
           <p>Sistema de Gestão Clínica</p>
@@ -94,6 +92,7 @@ if (isset($_POST["btnIniciarSessao"])) {
 
         <div class="form-group">
           <label class="form-label" for="login">Utilizador</label>
+
           <div class="input-icon">
             <i class="ti ti-user"></i>
             <input
@@ -109,6 +108,7 @@ if (isset($_POST["btnIniciarSessao"])) {
 
         <div class="form-group">
           <label class="form-label" for="password">Palavra-passe</label>
+
           <div class="input-icon">
             <i class="ti ti-lock"></i>
             <input
