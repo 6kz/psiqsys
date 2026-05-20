@@ -1,4 +1,21 @@
 <?php
+session_start();
+
+// Verifica se existe sessão iniciada
+if (
+    !isset($_SESSION['currentID']) ||
+    !isset($_SESSION['currentLogin'])
+) {
+
+    // destrói qualquer sessão residual
+    session_unset();
+    session_destroy();
+
+    // redireciona para login
+    header("Location: index.php");
+    exit;
+}
+
 require_once 'includes/db.php';
 $pagina_atual  = 'dashboard';
 $titulo_pagina = 'Dashboard';
