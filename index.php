@@ -70,7 +70,7 @@ if (isset($_POST["btnIniciarSessao"])) {
 
       <div class="login-brand">
         <div class="login-logo">
-          <i class="ti ti-pulse"></i>
+          <i class="ti ti-brain"></i>
         </div>
         <div>
           <h1>PsiqSys</h1>
