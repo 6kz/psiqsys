@@ -68,7 +68,7 @@ if (isset($_POST["btnIniciarSessao"])) {
     <section class="login-card">
 
       <div class="login-brand">
-        <img src="images/logo.png" alt="PsiqSys">
+        <img src="assets/img/logo.png" alt="PsiqSys">
       </div>
 
       <div class=" login-header">

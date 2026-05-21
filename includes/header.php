@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($titulo_pagina ?? 'PsiqSys') ?> — PsiqSys</title>
+    <title><?= htmlspecialchars($titulo_pagina ?? 'PsiqSys') ?> - PsiqSys</title>
     <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <!-- Tabler Icons CDN -->
@@ -29,7 +29,25 @@
     atualizarRelogio();
 </script>
 
-<body>
+<script>
+    function toggleTheme() {
+        const root = document.body;
+        const current = root.getAttribute("data-theme");
+
+        const next = current === "dark" ? "light" : "dark";
+        root.setAttribute("data-theme", next);
+
+        localStorage.setItem("theme", next);
+    }
+
+    // manter preferência
+    document.addEventListener("DOMContentLoaded", () => {
+        const saved = localStorage.getItem("theme") || "light";
+        document.body.setAttribute("data-theme", saved);
+    });
+</script>
+
+<body data-theme="light">
 
     <div class="layout">
 
@@ -131,6 +149,9 @@
             ?>
 
             <div class="topbar">
+                <button class="btn btn-outline btn-sm" onclick="toggleTheme()">
+                    <i class="ti ti-moon"></i>
+                </button>
                 <div class="page-title">
                     <?= htmlspecialchars($titulo_pagina ?? 'PsiqSys') ?>
                 </div>
