@@ -125,6 +125,9 @@ INSERT INTO PROFISSIONAL (nome, funcao, num_cedula) VALUES
   ('Enf. Miguel Fonseca',   'enfermeiro',  'E-20003'),
   ('Psi. Beatriz Lima',     'psicologo',   'P-30001'),
   ('Adm. Teresa Neves',     'administrativo','A-40001');
+
+INSERT INTO PROFISSIONAL (id_profissional, nome, funcao, num_cedula) VALUES (1000, 'admin','administrativo','AD-1000');
+
 -- id_profissional: 1..8
 
 
@@ -140,6 +143,10 @@ INSERT INTO UTILIZADOR (id_profissional, username, password_hash) VALUES
   (6,'miguel.fonseca', '$2b$12$testHashEnf3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'),
   (7,'beatriz.lima',   '$2b$12$testHashPsi1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'),
   (8,'teresa.neves',   '$2b$12$testHashAdm1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+
+INSERT INTO UTILIZADOR (id_profissional,id_utilizador, username, password_hash) VALUES
+  (1000, 'admin_psiqsys_0', '$2y$10$KpyI6G6zMcEy1Uqis9W1RuouLp2sfzEmqoZbm2ZezDcMvFmhrEi4a');
+  
 -- id_utilizador: 1..8
 
 INSERT INTO UTILIZADOR_PERFIL (id_utilizador, id_perfil) VALUES
