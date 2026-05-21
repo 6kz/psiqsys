@@ -19,6 +19,8 @@
 ### 🔐 Sistema
 
 - [ ] Adicionar botão de logout
+- [ ] Recuperar a palavra-passe (mudar a password de 90d em 90d?)
+- [ ] Mudar a palavra-passe no login (password_recovery.php) | user, password antiga, password nova e confirmação password nova
 
 ---
 
