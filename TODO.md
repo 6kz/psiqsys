@@ -1,12 +1,24 @@
-#  TO-DO
+# 🧠 PsiqSys — TO-DO
 
-- TI puder eliminar pacientes
-- Conseguir ver observações de mais fácil leitura
-- So medicos é que podem ter ações nas prescrições
-- Administrativo só podem ver dados do paciente
-- Enfermeiros para mexerem em camas
-- Butão de logout
+## 🚧 Funcionalidades Pendentes
 
-### Já feito:
+### 👥 Pacientes
+- [ ] Permitir à equipa de TI eliminar pacientes
+- [ ] Melhorar a visualização das observações clínicas
+- [ ] Administrativos apenas podem visualizar dados do paciente
 
-- Adicionar hora c/data
+### 💊 Prescrições
+- [ ] Apenas médicos podem executar ações nas prescrições
+
+### 🛏️ Camas & Internamentos
+- [ ] Permitir aos enfermeiros gerir camas e quartos
+
+### 🔐 Sistema
+- [ ] Adicionar botão de logout
+
+
+---
+
+# ✅ Já Implementado
+
+- [x] Adição da hora juntamente com a data no topbar
