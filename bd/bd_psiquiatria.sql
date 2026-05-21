@@ -592,7 +592,7 @@ ALTER TABLE SERVICO                  AUTO_INCREMENT = 1;
 -- ============================================================
 -- 1. SERVIÇO, QUARTOS E CAMAS
 -- ============================================================
-INSERT INTO SERVICO (nome) VALUES
+INSERT IGNORE INTO SERVICO (nome) VALUES
   ('Psiquiatria Adultos'),
   ('Psiquiatria Gerontopsiquiatria');
 
@@ -614,7 +614,7 @@ INSERT INTO CAMA (id_quarto, numero_cama, estado) VALUES
 -- ============================================================
 -- 2. DIAGNÓSTICOS DSM-5 / ICD-10
 -- ============================================================
-INSERT INTO DIAGNOSTICO_DSM (codigo_dsm, codigo_icd10, nome_diagnostico, descricao) VALUES
+INSERT IGNORE INTO DIAGNOSTICO_DSM (codigo_dsm, codigo_icd10, nome_diagnostico, descricao) VALUES
   ('296.40','F31.0', 'Perturbação Bipolar I — Episódio Maníaco Atual',       'Episódio maníaco sem características psicóticas'),
   ('296.41','F31.2', 'Perturbação Bipolar I — Maníaco com Psicose',          'Episódio maníaco com características psicóticas congruentes com o humor'),
   ('296.51','F31.31','Perturbação Bipolar I — Episódio Depressivo Moderado', 'Episódio depressivo de gravidade moderada'),
@@ -631,7 +631,7 @@ INSERT INTO DIAGNOSTICO_DSM (codigo_dsm, codigo_icd10, nome_diagnostico, descric
 -- ============================================================
 -- 3. MEDICAÇÃO
 -- ============================================================
-INSERT INTO MEDICACAO (nome, classe, dosagem, forma_farmaceutica) VALUES
+INSERT IGNORE INTO MEDICACAO (nome, classe, dosagem, forma_farmaceutica) VALUES
   ('Lítio',               'Estabilizador de humor',       '400mg',  'comprimido'),
   ('Valproato de sódio',  'Estabilizador / Antiepilético','500mg',  'comprimido'),
   ('Olanzapina',          'Antipsicótico atípico',         '10mg',  'comprimido'),
@@ -650,7 +650,7 @@ INSERT INTO MEDICACAO (nome, classe, dosagem, forma_farmaceutica) VALUES
 -- ============================================================
 -- 4. PERFIS DE ACESSO
 -- ============================================================
-INSERT INTO PERFIL_ACESSO (nome_perfil) VALUES
+INSERT IGNORE INTO PERFIL_ACESSO (nome_perfil) VALUES
   ('Médico'),('Enfermeiro'),('Psicólogo'),('Administrativo');
 -- id_perfil: 1..4
 
@@ -658,7 +658,7 @@ INSERT INTO PERFIL_ACESSO (nome_perfil) VALUES
 -- ============================================================
 -- 5. PROFISSIONAIS
 -- ============================================================
-INSERT INTO PROFISSIONAL (nome, funcao, num_cedula) VALUES
+INSERT IGNORE INTO PROFISSIONAL (nome, funcao, num_cedula) VALUES
   ('Dra. Ana Ferreira',     'medico',      'C-10001'),
   ('Dr. Rui Mendes',        'medico',      'C-10002'),
   ('Dra. Sofia Carvalho',   'medico',      'C-10003'),
@@ -668,7 +668,7 @@ INSERT INTO PROFISSIONAL (nome, funcao, num_cedula) VALUES
   ('Psi. Beatriz Lima',     'psicologo',   'P-30001'),
   ('Adm. Teresa Neves',     'administrativo','A-40001');
 
-INSERT INTO PROFISSIONAL (id_profissional, nome, funcao, num_cedula) VALUES (1000, 'admin','administrativo','AD-1000');
+INSERT IGNORE INTO PROFISSIONAL (id_profissional, nome, funcao, num_cedula) VALUES (1000, 'admin','administrativo','AD-1000');
 
 -- id_profissional: 1..8
 
@@ -676,7 +676,7 @@ INSERT INTO PROFISSIONAL (id_profissional, nome, funcao, num_cedula) VALUES (100
 -- ============================================================
 -- 6. UTILIZADORES
 -- ============================================================
-INSERT INTO UTILIZADOR (id_profissional, username, password_hash) VALUES
+INSERT IGNORE INTO UTILIZADOR (id_profissional, username, password_hash) VALUES
   (1,'ana.ferreira',   '$2b$12$testHashMedico1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'),
   (2,'rui.mendes',     '$2b$12$testHashMedico2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'),
   (3,'sofia.carvalho', '$2b$12$testHashMedico3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'),
@@ -686,7 +686,7 @@ INSERT INTO UTILIZADOR (id_profissional, username, password_hash) VALUES
   (7,'beatriz.lima',   '$2b$12$testHashPsi1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'),
   (8,'teresa.neves',   '$2b$12$testHashAdm1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
 
-INSERT INTO UTILIZADOR (id_profissional, username, password_hash) VALUES
+INSERT IGNORE INTO UTILIZADOR (id_profissional, username, password_hash) VALUES
   (1000, 'admin_psiqsys_0', '$2y$10$KpyI6G6zMcEy1Uqis9W1RuouLp2sfzEmqoZbm2ZezDcMvFmhrEi4a');
   
 -- id_utilizador: 1..8
