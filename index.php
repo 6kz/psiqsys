@@ -1,6 +1,4 @@
 <?php
-
-
 session_start();
 require_once 'includes/db.php';
 
@@ -11,19 +9,19 @@ if (isset($_POST["btnIniciarSessao"])) {
   $password = trim($_POST["password"] ?? '');
 
   $stmt = $pdo->prepare("
-        SELECT 
-            u.id_utilizador,
-            u.username,
-            u.password_hash,
-            u.ativo,
-            p.nome,
-            p.funcao
-        FROM UTILIZADOR u
-        JOIN PROFISSIONAL p ON p.id_profissional = u.id_profissional
-        WHERE u.username = :login
-          AND u.ativo = 1
-        LIMIT 1
-    ");
+SELECT
+u.id_utilizador,
+u.username,
+u.password_hash,
+u.ativo,
+p.nome,
+p.funcao
+FROM UTILIZADOR u
+JOIN PROFISSIONAL p ON p.id_profissional = u.id_profissional
+WHERE u.username = :login
+AND u.ativo = 1
+LIMIT 1
+");
 
   $stmt->execute([
     ':login' => $login
@@ -36,7 +34,7 @@ if (isset($_POST["btnIniciarSessao"])) {
   } else {
     session_regenerate_id(true);
 
-    $_SESSION['CurrentID'] = $linha["id_utilizador"];
+    $_SESSION['currentID'] = $linha["id_utilizador"];
     $_SESSION['currentNome'] = $linha["nome"];
     $_SESSION['currentLogin'] = $linha["username"];
     $_SESSION['currentFuncao'] = $linha["funcao"];
@@ -44,6 +42,8 @@ if (isset($_POST["btnIniciarSessao"])) {
     header('Location: dashboard.php');
     exit;
   }
+
+  #echo $erro;
 }
 
 ?>
