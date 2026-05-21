@@ -131,6 +131,7 @@ CREATE TABLE IF NOT EXISTS PACIENTE (
   num_utente       CHAR(9)      NOT NULL,
   contacto         VARCHAR(20)  NULL,
   morada           TEXT         NULL,
+  ativo            BOOLEAN      NOT NULL DEFAULT TRUE,
   created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
                    ON UPDATE CURRENT_TIMESTAMP,
@@ -702,17 +703,17 @@ INSERT INTO UTILIZADOR_PERFIL (id_utilizador, id_perfil) VALUES
 -- ============================================================
 -- 7. PACIENTES (10)
 -- ============================================================
-INSERT INTO PACIENTE (nome, data_nascimento, num_utente, contacto, morada) VALUES
-  ('Maria João Oliveira',  '1985-03-12','100000001','912111001','Rua das Flores 10, Porto'),
-  ('António Pereira Silva','1972-07-24','100000002','912111002','Av. da Liberdade 55, Lisboa'),
-  ('Filipa Costa Marques', '1993-11-05','100000003','912111003','Rua do Almada 33, Porto'),
-  ('Carlos Manuel Sousa',  '1968-01-30','100000004','912111004','Travessa da Sé 7, Braga'),
-  ('Rita Fernandes Lopes', '1990-09-18','100000005','912111005','Rua de Santa Catarina 120, Porto'),
-  ('Fernando Gomes Ramos', '1980-05-14','100000006','912111006','Av. dos Aliados 88, Porto'),
-  ('Inês Rodrigues Pinto', '1975-12-02','100000007','912111007','Rua Direita 45, Coimbra'),
-  ('Luís Alberto Monteiro','1960-08-09','100000008','912111008','Rua Nova 22, Guimarães'),
-  ('Ana Beatriz Nunes',    '2000-02-28','100000009','912111009','Rua do Bonjardim 67, Porto'),
-  ('Pedro Jorge Azevedo',  '1955-06-17','100000010','912111010','Largo do Paço 3, Viana do Castelo');
+INSERT INTO PACIENTE (nome, data_nascimento, num_utente, contacto, morada, ativo) VALUES
+  ('Maria João Oliveira',  '1985-03-12','100000001','912111001','Rua das Flores 10, Porto',1),
+  ('António Pereira Silva','1972-07-24','100000002','912111002','Av. da Liberdade 55, Lisboa',1),
+  ('Filipa Costa Marques', '1993-11-05','100000003','912111003','Rua do Almada 33, Porto',1),
+  ('Carlos Manuel Sousa',  '1968-01-30','100000004','912111004','Travessa da Sé 7, Braga',1),
+  ('Rita Fernandes Lopes', '1990-09-18','100000005','912111005','Rua de Santa Catarina 120, Porto',1),
+  ('Fernando Gomes Ramos', '1980-05-14','100000006','912111006','Av. dos Aliados 88, Porto',1),
+  ('Inês Rodrigues Pinto', '1975-12-02','100000007','912111007','Rua Direita 45, Coimbra',1),
+  ('Luís Alberto Monteiro','1960-08-09','100000008','912111008','Rua Nova 22, Guimarães',1),
+  ('Ana Beatriz Nunes',    '2000-02-28','100000009','912111009','Rua do Bonjardim 67, Porto',1),
+  ('Pedro Jorge Azevedo',  '1955-06-17','100000010','912111010','Largo do Paço 3, Viana do Castelo',1);
 -- id_paciente: 1..10
 
 

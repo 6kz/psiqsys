@@ -4,7 +4,6 @@
 
 ### 👥 Pacientes
 
-- [ ] Permitir à equipa de TI eliminar pacientes
 - [ ] Melhorar a visualização das observações clínicas e eventos críticos
 - [ ] Administrativos apenas podem visualizar dados do paciente
 
@@ -12,10 +11,12 @@
 
 - [ ] Apenas médicos podem executar ações nas prescrições
 - [ ] Adicionar modal para cancelamento de prescrição (se sim o porquê de ter cancelado)
+- [ ] Quando paciente é desativado devemos cancelar a prescrição?
 
 ### 🛏️ Camas & Internamentos
 
 - [ ] Permitir aos enfermeiros gerir camas e quartos
+- [ ] Mudar fonte de dark mode
 
 ### 🔐 Sistema
 
@@ -28,3 +29,4 @@
 # ✅ Já Implementado
 
 - [x] Adição da hora juntamente com a data no topbar
+- [x] Permitir à equipa de TI eliminar pacientes
