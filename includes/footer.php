@@ -14,7 +14,7 @@
     color: var(--text-3);
 ">
     <span>PsiqSys &copy; <?= date('Y') ?> — Sistema de Internamento Psiquiátrico</span>
-    <span class="mono">v2.2</span>
+    <span class="mono">v3.0</span>
 </footer>
 
 </body>
