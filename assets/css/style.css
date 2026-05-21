@@ -270,15 +270,24 @@ a:hover {
 
 .topbar-right {
     display: flex;
-    align-items: center;
-    gap: 16px;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 2px;
 }
 
 .topbar-date {
     font-size: .78rem;
     color: var(--text-3);
     font-family: var(--mono);
-    left: 0;
+    line-height: 1;
+}
+
+.topbar-hour {
+    font-size: .78rem;
+    color: var(--text-3);
+    font-family: var(--mono);
+    line-height: 1;
 }
 
 .content-area {

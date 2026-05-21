@@ -11,6 +11,24 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 </head>
 
+<script>
+    function atualizarRelogio() {
+
+        const agora = new Date();
+
+        const horas = String(agora.getHours()).padStart(2, '0');
+        const minutos = String(agora.getMinutes()).padStart(2, '0');
+        const segundos = String(agora.getSeconds()).padStart(2, '0');
+
+        document.getElementById('clock').textContent =
+            `${horas}:${minutos}:${segundos}`;
+    }
+
+    setInterval(atualizarRelogio, 1000);
+
+    atualizarRelogio();
+</script>
+
 <body>
 
     <div class="layout">
@@ -107,6 +125,9 @@
                 date('d') . ' de ' .
                 $meses[date('F')] . ' de ' .
                 date('Y');
+
+            $hora = date('H:i');
+
             ?>
 
             <div class="topbar">
@@ -115,10 +136,15 @@
                 </div>
 
                 <div class="topbar-right">
+
                     <span class="topbar-date">
                         <?= $data ?>
                     </span>
+
+                    <span class="topbar-hour" id="clock"></span>
+
                 </div>
+
             </div>
 
             <div class="content-area">
