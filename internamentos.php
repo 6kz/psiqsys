@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once 'includes/db.php';
 $pagina_atual  = 'internamentos';
 $titulo_pagina = 'Internamentos';
@@ -12,23 +14,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         exit;
     }
     if ($_POST['action'] === 'novo') {
+
+        // ── VERIFICAR SE A CAMA ESTÁ DISPONÍVEL ───────────────
+        $checkCama = $pdo->prepare("
+        SELECT estado
+        FROM CAMA
+        WHERE id_cama = ?
+    ");
+        $checkCama->execute([(int)$_POST['id_cama']]);
+        $cama = $checkCama->fetch();
+
+        if (!$cama || $cama['estado'] !== 'disponivel') {
+            header('Location: internamentos.php?erro=cama_indisponivel');
+            exit;
+        }
+
+        // ── INSERIR INTERNAMENTO ───────────────────────────────
         $stmt = $pdo->prepare("
-            INSERT INTO INTERNAMENTO (id_paciente,id_cama,data_admissao,motivo_internamento,
-              tipo_episodio,risco_suicidario,risco_agressividade,estado_clinico)
-            VALUES (?,?,?,?,?,?,?,?)
-        ");
-        $stmt->execute([
-            (int)$_POST['id_paciente'],
-            (int)$_POST['id_cama'],
-            $_POST['data_admissao'],
-            $_POST['motivo'],
-            $_POST['tipo_episodio'],
-            $_POST['risco_suicidario'],
-            $_POST['risco_agressividade'],
-            $_POST['estado_clinico'],
-        ]);
-        // Marca cama ocupada
-        $pdo->prepare("UPDATE CAMA SET estado='ocupada' WHERE id_cama=?")->execute([(int)$_POST['id_cama']]);
+        INSERT INTO INTERNAMENTO (
+            id_paciente,id_cama,data_admissao,motivo_internamento,
+            tipo_episodio,risco_suicidario,risco_agressividade,estado_clinico
+        )
+        VALUES (?,?,?,?,?,?,?,?)
+    ");
+
+        try {
+
+            $stmt->execute([
+                (int)$_POST['id_paciente'],
+                (int)$_POST['id_cama'],
+                $_POST['data_admissao'],
+                $_POST['motivo'],
+                $_POST['tipo_episodio'],
+                $_POST['risco_suicidario'],
+                $_POST['risco_agressividade'],
+                $_POST['estado_clinico'],
+            ]);
+
+            // marca cama ocupada
+            $pdo->prepare("UPDATE CAMA SET estado='ocupada' WHERE id_cama=?")
+                ->execute([(int)$_POST['id_cama']]);
+
+            header('Location: internamentos.php?ok=novo');
+            exit;
+        } catch (PDOException $e) {
+
+            // erro trigger cama ocupada
+            if ($e->getCode() == '45000') {
+                header('Location: internamentos.php?erro=cama_ocupada');
+                exit;
+            }
+
+            // outros erros
+            header('Location: internamentos.php?erro=geral');
+            exit;
+        }
+
+        // marca cama ocupada
+        $pdo->prepare("UPDATE CAMA SET estado='ocupada' WHERE id_cama=?")
+            ->execute([(int)$_POST['id_cama']]);
+
         header('Location: internamentos.php?ok=novo');
         exit;
     }
@@ -71,6 +116,27 @@ require_once 'includes/header.php';
 ?>
 
 <?php if (isset($_GET['ok'])): ?>
+    <?php if (isset($_GET['erro'])): ?>
+        <div class="alert alert-danger mb-4">
+            <i class="ti ti-alert-circle"></i>
+
+            <?php
+            switch ($_GET['erro']) {
+
+                case 'cama_ocupada':
+                    echo 'A cama selecionada já se encontra ocupada.';
+                    break;
+
+                case 'cama_indisponivel':
+                    echo 'A cama selecionada não está disponível.';
+                    break;
+
+                default:
+                    echo 'Ocorreu um erro ao criar o internamento.';
+            }
+            ?>
+        </div>
+    <?php endif; ?>
     <div class="alert alert-success mb-4">
         <i class="ti ti-circle-check"></i>
         <?= $_GET['ok'] === 'alta' ? 'Alta clínica registada com sucesso.' : 'Internamento criado com sucesso.' ?>

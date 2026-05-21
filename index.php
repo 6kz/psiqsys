@@ -1,4 +1,6 @@
 <?php
+
+
 session_start();
 require_once 'includes/db.php';
 
@@ -34,7 +36,7 @@ if (isset($_POST["btnIniciarSessao"])) {
   } else {
     session_regenerate_id(true);
 
-    $_SESSION['currentID'] = $linha["id_utilizador"];
+    $_SESSION['CurrentID'] = $linha["id_utilizador"];
     $_SESSION['currentNome'] = $linha["nome"];
     $_SESSION['currentLogin'] = $linha["username"];
     $_SESSION['currentFuncao'] = $linha["funcao"];
@@ -66,17 +68,10 @@ if (isset($_POST["btnIniciarSessao"])) {
     <section class="login-card">
 
       <div class="login-brand">
-        <div class="login-logo">
-          <i class="ti ti-brain"></i>
-        </div>
-
-        <div>
-          <h1>PsiqSys</h1>
-          <p>Sistema de Gestão Clínica</p>
-        </div>
+        <img src="images/logo.png" alt="PsiqSys">
       </div>
 
-      <div class="login-header">
+      <div class=" login-header">
         <h2>Bem-vindo</h2>
         <p>Inicie sessão para aceder ao backoffice.</p>
       </div>

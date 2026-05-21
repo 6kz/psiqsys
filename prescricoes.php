@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once 'includes/db.php';
 $pagina_atual  = 'prescricoes';
 $titulo_pagina = 'Prescrições';
@@ -229,7 +231,7 @@ function estado_badge(string $e): string
                                         <input type="hidden" name="id" value="<?= $r['id_prescricao'] ?>">
                                         <input type="hidden" name="estado" value="suspensa">
                                         <button class="btn btn-outline btn-sm" title="Suspender">
-                                            <i class="ti ti-pause"></i>
+                                            <i class="ti ti-player-pause"></i>
                                         </button>
                                     </form>
                                     <form method="post" onsubmit="return confirm('Cancelar esta prescrição?')">

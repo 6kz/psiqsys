@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once 'includes/db.php';
 $pagina_atual  = 'eventos';
 $titulo_pagina = 'Eventos Críticos';
