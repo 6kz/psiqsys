@@ -1,102 +1,296 @@
 <?php
 require_once 'includes/db.php';
+
 $pagina_atual  = 'pacientes';
 $titulo_pagina = 'Pacientes';
 
-// ── Novo paciente ──────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// NOVO PACIENTE
+// ─────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'novo') {
-    $stmt = $pdo->prepare("
-        INSERT INTO PACIENTE (nome, data_nascimento, num_utente, contacto, morada)
-        VALUES (?, ?, ?, ?, ?)
-    ");
-    $stmt->execute([
-        trim($_POST['nome']),
-        $_POST['data_nascimento'],
-        trim($_POST['num_utente']),
-        trim($_POST['contacto'] ?? ''),
-        trim($_POST['morada'] ?? ''),
-    ]);
-    header('Location: pacientes.php?ok=1');
-    exit;
+
+    try {
+
+        $nome             = trim($_POST['nome']);
+        $data_nascimento  = $_POST['data_nascimento'];
+        $num_utente       = trim($_POST['num_utente']);
+        $contacto         = trim($_POST['contacto'] ?? '');
+        $morada           = trim($_POST['morada'] ?? '');
+
+        // Validar nº utente
+        if (!preg_match('/^\d{9}$/', $num_utente)) {
+            header('Location: pacientes.php?erro=utente_invalido');
+            exit;
+        }
+
+        // Verificar duplicado
+        $check = $pdo->prepare("
+            SELECT id_paciente
+            FROM PACIENTE
+            WHERE num_utente = ?
+        ");
+
+        $check->execute([$num_utente]);
+
+        if ($check->fetch()) {
+            header('Location: pacientes.php?erro=utente_existente');
+            exit;
+        }
+
+        // Inserir paciente
+        $stmt = $pdo->prepare("
+            INSERT INTO PACIENTE
+            (nome, data_nascimento, num_utente, contacto, morada)
+            VALUES (?, ?, ?, ?, ?)
+        ");
+
+        $stmt->execute([
+            $nome,
+            $data_nascimento,
+            $num_utente,
+            $contacto,
+            $morada
+        ]);
+
+        header('Location: pacientes.php?ok=1');
+        exit;
+    } catch (PDOException $e) {
+
+        die("
+            <div style='
+                padding:20px;
+                font-family:Arial;
+                background:#ffe5e5;
+                color:#a00000;
+                border:1px solid #ffb3b3;
+                border-radius:8px;
+                margin:20px;
+            '>
+                <h3>Erro ao criar paciente</h3>
+                <p>" . htmlspecialchars($e->getMessage()) . "</p>
+            </div>
+        ");
+    }
 }
 
-// ── Editar paciente ────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// EDITAR PACIENTE
+// ─────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'editar') {
-    $stmt = $pdo->prepare("
-        UPDATE PACIENTE SET nome=?, data_nascimento=?, contacto=?, morada=?
-        WHERE id_paciente=?
-    ");
-    $stmt->execute([
-        trim($_POST['nome']),
-        $_POST['data_nascimento'],
-        trim($_POST['contacto'] ?? ''),
-        trim($_POST['morada'] ?? ''),
-        (int)$_POST['id'],
-    ]);
-    header('Location: pacientes.php?ok=edit');
-    exit;
+
+    try {
+
+        $stmt = $pdo->prepare("
+            UPDATE PACIENTE
+            SET nome = ?,
+                data_nascimento = ?,
+                contacto = ?,
+                morada = ?
+            WHERE id_paciente = ?
+        ");
+
+        $stmt->execute([
+            trim($_POST['nome']),
+            $_POST['data_nascimento'],
+            trim($_POST['contacto'] ?? ''),
+            trim($_POST['morada'] ?? ''),
+            (int)$_POST['id'],
+        ]);
+
+        header('Location: pacientes.php?ok=edit');
+        exit;
+    } catch (PDOException $e) {
+
+        die("
+            <div style='
+                padding:20px;
+                font-family:Arial;
+                background:#ffe5e5;
+                color:#a00000;
+                border:1px solid #ffb3b3;
+                border-radius:8px;
+                margin:20px;
+            '>
+                <h3>Erro ao atualizar paciente</h3>
+                <p>" . htmlspecialchars($e->getMessage()) . "</p>
+            </div>
+        ");
+    }
 }
 
-// ── Filtro / pesquisa ──────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// PESQUISA
+// ─────────────────────────────────────────────────────────────
 $search = trim($_GET['q'] ?? '');
+
 $params = [];
 $where  = '1=1';
+
 if ($search) {
-    $where   = '(nome LIKE ? OR num_utente LIKE ? OR contacto LIKE ?)';
-    $params  = ["%$search%", "%$search%", "%$search%"];
+
+    $where = '
+        (
+            nome LIKE ?
+            OR num_utente LIKE ?
+            OR contacto LIKE ?
+        )
+    ';
+
+    $params = [
+        "%$search%",
+        "%$search%",
+        "%$search%"
+    ];
 }
 
 $rows = $pdo->prepare("
-    SELECT p.*,
-           (SELECT COUNT(*) FROM INTERNAMENTO i WHERE i.id_paciente = p.id_paciente) AS total_internamentos,
-           (SELECT COUNT(*) FROM INTERNAMENTO i WHERE i.id_paciente = p.id_paciente AND i.data_alta IS NULL) AS internamento_ativo
+    SELECT
+        p.*,
+
+        (
+            SELECT COUNT(*)
+            FROM INTERNAMENTO i
+            WHERE i.id_paciente = p.id_paciente
+        ) AS total_internamentos,
+
+        (
+            SELECT COUNT(*)
+            FROM INTERNAMENTO i
+            WHERE i.id_paciente = p.id_paciente
+            AND i.data_alta IS NULL
+        ) AS internamento_ativo
+
     FROM PACIENTE p
+
     WHERE $where
+
     ORDER BY p.nome
+
     LIMIT 100
 ");
+
 $rows->execute($params);
+
 $rows = $rows->fetchAll();
 
-// Dados para edição via modal
+// ─────────────────────────────────────────────────────────────
+// DADOS PARA EDIÇÃO
+// ─────────────────────────────────────────────────────────────
 $edit_pac = null;
+
 if (isset($_GET['edit'])) {
-    $s = $pdo->prepare("SELECT * FROM PACIENTE WHERE id_paciente=?");
-    $s->execute([(int)$_GET['edit']]);
+
+    $s = $pdo->prepare("
+        SELECT *
+        FROM PACIENTE
+        WHERE id_paciente = ?
+    ");
+
+    $s->execute([
+        (int)$_GET['edit']
+    ]);
+
     $edit_pac = $s->fetch();
 }
 
 require_once 'includes/header.php';
 ?>
 
+<!-- ALERTAS -->
+
 <?php if (isset($_GET['ok'])): ?>
+
     <div class="alert alert-success mb-4">
         <i class="ti ti-circle-check"></i>
-        <?= $_GET['ok'] === 'edit' ? 'Paciente atualizado com sucesso.' : 'Paciente criado com sucesso.' ?>
+
+        <?= $_GET['ok'] === 'edit'
+            ? 'Paciente atualizado com sucesso.'
+            : 'Paciente criado com sucesso.'
+        ?>
     </div>
+
 <?php endif; ?>
 
+
+<?php if (isset($_GET['erro']) && $_GET['erro'] === 'utente_existente'): ?>
+
+    <div class="alert alert-danger mb-4">
+        <i class="ti ti-alert-circle"></i>
+        Já existe um paciente com esse número de utente.
+    </div>
+
+<?php endif; ?>
+
+
+<?php if (isset($_GET['erro']) && $_GET['erro'] === 'utente_invalido'): ?>
+
+    <div class="alert alert-danger mb-4">
+        <i class="ti ti-alert-circle"></i>
+        O número de utente deve ter exatamente 9 dígitos.
+    </div>
+
+<?php endif; ?>
+
+<!-- TOPO -->
+
 <div class="flex items-center justify-between mb-4">
+
     <form method="get" style="display:flex;gap:8px;align-items:center">
+
         <div class="search-bar">
             <i class="ti ti-search"></i>
-            <input type="text" name="q" placeholder="Pesquisar nome ou nº utente…" value="<?= htmlspecialchars($search) ?>">
+
+            <input
+                type="text"
+                name="q"
+                placeholder="Pesquisar nome ou nº utente…"
+                value="<?= htmlspecialchars($search) ?>">
         </div>
-        <button class="btn btn-outline btn-sm" type="submit">Pesquisar</button>
-        <?php if ($search): ?><a href="pacientes.php" class="btn btn-outline btn-sm"><i class="ti ti-x"></i></a><?php endif; ?>
+
+        <button class="btn btn-outline btn-sm" type="submit">
+            Pesquisar
+        </button>
+
+        <?php if ($search): ?>
+
+            <a href="pacientes.php" class="btn btn-outline btn-sm">
+                <i class="ti ti-x"></i>
+            </a>
+
+        <?php endif; ?>
+
     </form>
-    <button class="btn btn-primary btn-sm" onclick="openModal('modal-novo')">
-        <i class="ti ti-plus"></i> Novo Paciente
+
+    <button
+        class="btn btn-primary btn-sm"
+        onclick="openModal('modal-novo')">
+        <i class="ti ti-plus"></i>
+        Novo Paciente
     </button>
+
 </div>
 
+<!-- TABELA -->
+
 <div class="card">
+
     <div class="card-header">
-        <span class="card-title"><i class="ti ti-users"></i> Pacientes</span>
-        <span class="text-sm text-muted"><?= count($rows) ?> registos</span>
+
+        <span class="card-title">
+            <i class="ti ti-users"></i>
+            Pacientes
+        </span>
+
+        <span class="text-sm text-muted">
+            <?= count($rows) ?> registos
+        </span>
+
     </div>
+
     <div class="table-wrap">
+
         <table>
+
             <thead>
                 <tr>
                     <th>#</th>
@@ -109,139 +303,339 @@ require_once 'includes/header.php';
                     <th>Ações</th>
                 </tr>
             </thead>
+
             <tbody>
+
                 <?php foreach ($rows as $r): ?>
+
                     <tr>
-                        <td class="mono text-muted"><?= $r['id_paciente'] ?></td>
-                        <td>
-                            <div class="fw-600"><?= htmlspecialchars($r['nome']) ?></div>
-                            <div class="text-sm text-muted"><?= htmlspecialchars($r['morada'] ?? '—') ?></div>
+
+                        <td class="mono text-muted">
+                            <?= $r['id_paciente'] ?>
                         </td>
-                        <td class="mono"><?= $r['num_utente'] ?></td>
-                        <td class="mono text-sm"><?= date('d/m/Y', strtotime($r['data_nascimento'])) ?></td>
-                        <td class="text-sm"><?= htmlspecialchars($r['contacto'] ?? '—') ?></td>
-                        <td><span class="badge badge-blue"><?= $r['total_internamentos'] ?></span></td>
+
                         <td>
-                            <?php if ($r['internamento_ativo'] > 0): ?>
-                                <span class="badge badge-red">Internado</span>
-                            <?php else: ?>
-                                <span class="badge badge-green">Ambulatório</span>
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                            <div class="flex gap-2">
-                                <a href="pacientes.php?edit=<?= $r['id_paciente'] ?>" class="btn btn-outline btn-sm" title="Editar">
-                                    <i class="ti ti-pencil"></i>
-                                </a>
-                                <?php if ($r['internamento_ativo'] > 0): ?>
-                                    <?php
-                                    $sid = $pdo->prepare("SELECT id_internamento FROM INTERNAMENTO WHERE id_paciente=? AND data_alta IS NULL LIMIT 1");
-                                    $sid->execute([$r['id_paciente']]);
-                                    $sid_r = $sid->fetch();
-                                    ?>
-                                    <a href="internamento_detalhe.php?id=<?= $sid_r['id_internamento'] ?>" class="btn btn-outline btn-sm" title="Ver internamento">
-                                        <i class="ti ti-bed"></i>
-                                    </a>
-                                <?php endif; ?>
+                            <div class="fw-600">
+                                <?= htmlspecialchars($r['nome']) ?>
+                            </div>
+
+                            <div class="text-sm text-muted">
+                                <?= htmlspecialchars($r['morada'] ?? '—') ?>
                             </div>
                         </td>
+
+                        <td class="mono">
+                            <?= $r['num_utente'] ?>
+                        </td>
+
+                        <td class="mono text-sm">
+                            <?= date('d/m/Y', strtotime($r['data_nascimento'])) ?>
+                        </td>
+
+                        <td class="text-sm">
+                            <?= htmlspecialchars($r['contacto'] ?? '—') ?>
+                        </td>
+
+                        <td>
+                            <span class="badge badge-blue">
+                                <?= $r['total_internamentos'] ?>
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <?php if ($r['internamento_ativo'] > 0): ?>
+
+                                <span class="badge badge-red">
+                                    Internado
+                                </span>
+
+                            <?php else: ?>
+
+                                <span class="badge badge-green">
+                                    Ambulatório
+                                </span>
+
+                            <?php endif; ?>
+
+                        </td>
+
+                        <td>
+
+                            <div class="flex gap-2">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline btn-sm"
+                                    onclick='abrirEditar(
+                                        <?= $r["id_paciente"] ?>,
+                                        <?= json_encode($r["nome"]) ?>,
+                                        <?= json_encode($r["data_nascimento"]) ?>,
+                                        <?= json_encode($r["contacto"] ?? "") ?>,
+                                        <?= json_encode($r["morada"] ?? "") ?>
+                                    )'>
+                                    <i class="ti ti-pencil"></i>
+                                </button>
+
+                            </div>
+
+                        </td>
+
                     </tr>
+
                 <?php endforeach; ?>
+
                 <?php if (empty($rows)): ?>
+
                     <tr>
-                        <td colspan="8" class="text-muted text-sm" style="text-align:center;padding:32px">Nenhum paciente encontrado</td>
+                        <td
+                            colspan="8"
+                            class="text-muted text-sm"
+                            style="text-align:center;padding:32px">
+                            Nenhum paciente encontrado
+                        </td>
                     </tr>
+
                 <?php endif; ?>
+
             </tbody>
+
         </table>
+
     </div>
+
 </div>
 
-<!-- Modal Novo Paciente -->
-<div class="modal-overlay <?= (!$edit_pac && isset($_GET['modal'])) ? 'open' : '' ?>" id="modal-novo">
+<!-- MODAL NOVO -->
+
+<div class="modal-overlay" id="modal-novo">
+
     <div class="modal">
+
         <div class="modal-header">
-            <span class="modal-title"><i class="ti ti-user-plus" style="color:var(--primary);margin-right:8px"></i>Novo Paciente</span>
-            <button class="btn btn-outline btn-icon" onclick="closeModal('modal-novo')"><i class="ti ti-x"></i></button>
+
+            <span class="modal-title">
+                <i
+                    class="ti ti-user-plus"
+                    style="color:var(--primary);margin-right:8px"></i>
+
+                Novo Paciente
+            </span>
+
+            <button
+                class="btn btn-outline btn-icon"
+                onclick="closeModal('modal-novo')">
+                <i class="ti ti-x"></i>
+            </button>
+
         </div>
+
         <form method="post">
+
             <input type="hidden" name="action" value="novo">
+
             <div class="modal-body">
+
                 <div class="form-grid form-grid-2">
+
+                    <div class="form-group" style="grid-column:1/-1">
+
+                        <label class="form-label">
+                            Nome Completo *
+                        </label>
+
+                        <input
+                            type="text"
+                            name="nome"
+                            class="form-control"
+                            required>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            Nº Utente (SNS) *
+                        </label>
+
+                        <input
+                            type="text"
+                            name="num_utente"
+                            class="form-control"
+                            required
+                            maxlength="9"
+                            pattern="\d{9}">
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            Data de Nascimento *
+                        </label>
+
+                        <input
+                            type="date"
+                            name="data_nascimento"
+                            class="form-control"
+                            required>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            Contacto
+                        </label>
+
+                        <input
+                            type="text"
+                            name="contacto"
+                            class="form-control">
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            Morada
+                        </label>
+
+                        <input
+                            type="text"
+                            name="morada"
+                            class="form-control">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-outline"
+                    onclick="closeModal('modal-novo')">
+                    Cancelar
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+                    <i class="ti ti-check"></i>
+                    Criar Paciente
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- MODAL EDITAR -->
+
+<div class="modal-overlay" id="modal-editar">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <span class="modal-title">
+                <i class="ti ti-pencil" style="color:var(--primary);margin-right:8px"></i>
+                Editar Paciente
+            </span>
+
+            <button
+                class="btn btn-outline btn-icon"
+                type="button"
+                onclick="closeModal('modal-editar')">
+                <i class="ti ti-x"></i>
+            </button>
+
+        </div>
+
+        <form method="post">
+
+            <input type="hidden" name="action" value="editar">
+            <input type="hidden" name="id" id="edit-id">
+
+            <div class="modal-body">
+
+                <div class="form-grid form-grid-2">
+
+                    <!-- NOME -->
                     <div class="form-group" style="grid-column:1/-1">
                         <label class="form-label">Nome Completo *</label>
-                        <input type="text" name="nome" class="form-control" required placeholder="Nome do paciente">
+                        <input
+                            type="text"
+                            name="nome"
+                            id="edit-nome"
+                            class="form-control"
+                            required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Nº Utente (SNS) *</label>
-                        <input type="text" name="num_utente" class="form-control" required placeholder="9 dígitos" maxlength="9" pattern="\d{9}">
-                    </div>
+
+                    <!-- DATA NASCIMENTO -->
                     <div class="form-group">
                         <label class="form-label">Data de Nascimento *</label>
-                        <input type="date" name="data_nascimento" class="form-control" required>
+                        <input
+                            type="date"
+                            name="data_nascimento"
+                            id="edit-data"
+                            class="form-control"
+                            required>
                     </div>
+
+                    <!-- CONTACTO -->
                     <div class="form-group">
                         <label class="form-label">Contacto</label>
-                        <input type="text" name="contacto" class="form-control" placeholder="Telemóvel ou telefone">
+                        <input
+                            type="text"
+                            name="contacto"
+                            id="edit-contacto"
+                            class="form-control">
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Morada</label>
-                        <input type="text" name="morada" class="form-control" placeholder="Cidade, País">
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline" onclick="closeModal('modal-novo')">Cancelar</button>
-                <button type="submit" class="btn btn-primary"><i class="ti ti-check"></i> Criar Paciente</button>
-            </div>
-        </form>
-    </div>
-</div>
 
-<!-- Modal Editar Paciente -->
-<?php if ($edit_pac): ?>
-    <div class="modal-overlay open" id="modal-editar">
-        <div class="modal">
-            <div class="modal-header">
-                <span class="modal-title"><i class="ti ti-pencil" style="color:var(--primary);margin-right:8px"></i>Editar Paciente</span>
-                <a href="pacientes.php" class="btn btn-outline btn-icon"><i class="ti ti-x"></i></a>
-            </div>
-            <form method="post">
-                <input type="hidden" name="action" value="editar">
-                <input type="hidden" name="id" value="<?= $edit_pac['id_paciente'] ?>">
-                <div class="modal-body">
-                    <div class="form-grid form-grid-2">
-                        <div class="form-group" style="grid-column:1/-1">
-                            <label class="form-label">Nome Completo *</label>
-                            <input type="text" name="nome" class="form-control" required value="<?= htmlspecialchars($edit_pac['nome']) ?>">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Nº Utente</label>
-                            <input type="text" class="form-control" value="<?= $edit_pac['num_utente'] ?>" disabled style="background:var(--surface-2)">
-                            <span class="text-sm text-muted">Não editável</span>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Data de Nascimento *</label>
-                            <input type="date" name="data_nascimento" class="form-control" required value="<?= $edit_pac['data_nascimento'] ?>">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Contacto</label>
-                            <input type="text" name="contacto" class="form-control" value="<?= htmlspecialchars($edit_pac['contacto'] ?? '') ?>">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Morada</label>
-                            <input type="text" name="morada" class="form-control" value="<?= htmlspecialchars($edit_pac['morada'] ?? '') ?>">
-                        </div>
+                    <!-- MORADA -->
+                    <div class="form-group" style="grid-column:1/-1">
+                        <label class="form-label">Morada</label>
+                        <input
+                            type="text"
+                            name="morada"
+                            id="edit-morada"
+                            class="form-control">
                     </div>
+
                 </div>
-                <div class="modal-footer">
-                    <a href="pacientes.php" class="btn btn-outline">Cancelar</a>
-                    <button type="submit" class="btn btn-primary"><i class="ti ti-check"></i> Guardar Alterações</button>
-                </div>
-            </form>
-        </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-outline"
+                    onclick="closeModal('modal-editar')">
+                    Cancelar
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+                    <i class="ti ti-check"></i>
+                    Guardar Alterações
+                </button>
+
+            </div>
+
+        </form>
+
     </div>
-<?php endif; ?>
+
+</div>
 
 <script>
     function openModal(id) {
@@ -251,9 +645,25 @@ require_once 'includes/header.php';
     function closeModal(id) {
         document.getElementById(id).classList.remove('open');
     }
+
+    // ABRIR EDITAR
+    function abrirEditar(id, nome, data, contacto, morada) {
+
+        document.getElementById('edit-id').value = id;
+        document.getElementById('edit-nome').value = nome;
+        document.getElementById('edit-data').value = data;
+        document.getElementById('edit-contacto').value = contacto;
+        document.getElementById('edit-morada').value = morada;
+
+        openModal('modal-editar');
+    }
+
+    // fechar ao clicar fora
     document.querySelectorAll('.modal-overlay').forEach(m => {
         m.addEventListener('click', e => {
-            if (e.target === m) m.classList.remove('open');
+            if (e.target === m) {
+                m.classList.remove('open');
+            }
         });
     });
 </script>
