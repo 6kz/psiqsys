@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS PACIENTE (
 CREATE TABLE IF NOT EXISTS PROFISSIONAL (
   id_profissional  INT          NOT NULL AUTO_INCREMENT,
   nome             VARCHAR(150) NOT NULL,
-  funcao           ENUM('medico','enfermeiro','psicologo','assistente_social','administrativo')
+  funcao           ENUM('medico','enfermeiro','psicologo','assistente_social','administrativo','ti')
                    NOT NULL,
   num_cedula       VARCHAR(20)  NOT NULL,
   created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -651,7 +651,7 @@ INSERT IGNORE INTO MEDICACAO (nome, classe, dosagem, forma_farmaceutica) VALUES
 -- 4. PERFIS DE ACESSO
 -- ============================================================
 INSERT IGNORE INTO PERFIL_ACESSO (nome_perfil) VALUES
-  ('Médico'),('Enfermeiro'),('Psicólogo'),('Administrativo');
+  ('Médico'),('Enfermeiro'),('Psicólogo'),('Administrativo'),('TI');
 -- id_perfil: 1..4
 
 
@@ -668,7 +668,7 @@ INSERT IGNORE INTO PROFISSIONAL (nome, funcao, num_cedula) VALUES
   ('Psi. Beatriz Lima',     'psicologo',   'P-30001'),
   ('Adm. Teresa Neves',     'administrativo','A-40001');
 
-INSERT IGNORE INTO PROFISSIONAL (id_profissional, nome, funcao, num_cedula) VALUES (1000, 'admin','administrativo','AD-1000');
+INSERT IGNORE INTO PROFISSIONAL (id_profissional, nome, funcao, num_cedula) VALUES (1000, 'admin','ti','AD-1000');
 
 -- id_profissional: 1..8
 
