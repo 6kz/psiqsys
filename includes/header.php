@@ -65,7 +65,7 @@
             <div class="sidebar-footer">
                 <i class="ti ti-user-circle" style="font-size:26px"></i>
                 <div>
-                    <strong>Utilizador</strong>
+                    <strong><?= htmlspecialchars($_SESSION['currentNome']) ?></strong>
                     <div><?= date('d/m/Y') ?></div>
                 </div>
             </div>
