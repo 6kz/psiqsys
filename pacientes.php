@@ -6,6 +6,45 @@ require_once 'includes/db.php';
 $pagina_atual  = 'pacientes';
 $titulo_pagina = 'Pacientes';
 
+// Obter a função atual da sessão (garante que não dá erro se não estiver definida)
+$funcao_atual = $_SESSION['currentFuncao'] ?? '';
+
+// ─────────────────────────────────────────────────────────────
+// ELIMINAR PACIENTE (Apenas para a função 'ti')
+// ─────────────────────────────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'eliminar') {
+    if ($funcao_atual !== 'ti') {
+        header('Location: pacientes.php?erro=sem_permissao');
+        exit;
+    }
+
+    try {
+        $id_eliminar = (int)$_POST['id_paciente'];
+
+        $stmt = $pdo->prepare("DELETE FROM PACIENTE WHERE id_paciente = ?");
+        $stmt->execute([$id_eliminar]);
+
+        header('Location: pacientes.php?ok=delete');
+        exit;
+    } catch (PDOException $e) {
+        die("
+            <div style='
+                padding:20px;
+                font-family:Arial;
+                background:#ffe5e5;
+                color:#a00000;
+                border:1px solid #ffb3b3;
+                border-radius:8px;
+                margin:20px;
+            '>
+                <h3>Erro ao eliminar paciente</h3>
+                <p>Certifique-se que o paciente não possui internamentos vinculados.</p>
+                <p><small>" . htmlspecialchars($e->getMessage()) . "</small></p>
+            </div>
+        ");
+    }
+}
+
 // ─────────────────────────────────────────────────────────────
 // NOVO PACIENTE
 // ─────────────────────────────────────────────────────────────
@@ -198,16 +237,19 @@ if (isset($_GET['edit'])) {
 require_once 'includes/header.php';
 ?>
 
-<!-- ALERTAS -->
-
 <?php if (isset($_GET['ok'])): ?>
 
     <div class="alert alert-success mb-4">
         <i class="ti ti-circle-check"></i>
 
-        <?= $_GET['ok'] === 'edit'
-            ? 'Paciente atualizado com sucesso.'
-            : 'Paciente criado com sucesso.'
+        <?php
+        if ($_GET['ok'] === 'edit') {
+            echo 'Paciente atualizado com sucesso.';
+        } elseif ($_GET['ok'] === 'delete') {
+            echo 'Paciente eliminado com sucesso.';
+        } else {
+            echo 'Paciente criado com sucesso.';
+        }
         ?>
     </div>
 
@@ -233,7 +275,14 @@ require_once 'includes/header.php';
 
 <?php endif; ?>
 
-<!-- TOPO -->
+<?php if (isset($_GET['erro']) && $_GET['erro'] === 'sem_permissao'): ?>
+
+    <div class="alert alert-danger mb-4">
+        <i class="ti ti-alert-circle"></i>
+        Erro: Não tem permissões para eliminar registos.
+    </div>
+
+<?php endif; ?>
 
 <div class="flex items-center justify-between mb-4">
 
@@ -271,8 +320,6 @@ require_once 'includes/header.php';
     </button>
 
 </div>
-
-<!-- TABELA -->
 
 <div class="card">
 
@@ -379,6 +426,16 @@ require_once 'includes/header.php';
                                     <i class="ti ti-pencil"></i>
                                 </button>
 
+                                <?php if ($funcao_atual === 'ti'): ?>
+                                    <form method="post" action="pacientes.php" style="display:inline;" onsubmit="return confirmarEliminacao(<?= json_encode($r['nome']) ?>);">
+                                        <input type="hidden" name="action" value="eliminar">
+                                        <input type="hidden" name="id_paciente" value="<?= $r['id_paciente'] ?>">
+                                        <button type="submit" class="btn btn-outline btn-sm" style="color: var(--red, #dc2626); border-color: var(--red, #fca5a5);" title="Eliminar Paciente">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
+
                             </div>
 
                         </td>
@@ -407,8 +464,6 @@ require_once 'includes/header.php';
     </div>
 
 </div>
-
-<!-- MODAL NOVO -->
 
 <div class="modal-overlay" id="modal-novo">
 
@@ -538,8 +593,6 @@ require_once 'includes/header.php';
 
 </div>
 
-<!-- MODAL EDITAR -->
-
 <div class="modal-overlay" id="modal-editar">
 
     <div class="modal">
@@ -569,7 +622,6 @@ require_once 'includes/header.php';
 
                 <div class="form-grid form-grid-2">
 
-                    <!-- NOME -->
                     <div class="form-group" style="grid-column:1/-1">
                         <label class="form-label">Nome Completo *</label>
                         <input
@@ -580,7 +632,6 @@ require_once 'includes/header.php';
                             required>
                     </div>
 
-                    <!-- DATA NASCIMENTO -->
                     <div class="form-group">
                         <label class="form-label">Data de Nascimento *</label>
                         <input
@@ -591,7 +642,6 @@ require_once 'includes/header.php';
                             required>
                     </div>
 
-                    <!-- CONTACTO -->
                     <div class="form-group">
                         <label class="form-label">Contacto</label>
                         <input
@@ -601,7 +651,6 @@ require_once 'includes/header.php';
                             class="form-control">
                     </div>
 
-                    <!-- MORADA -->
                     <div class="form-group" style="grid-column:1/-1">
                         <label class="form-label">Morada</label>
                         <input
@@ -658,6 +707,11 @@ require_once 'includes/header.php';
         document.getElementById('edit-morada').value = morada;
 
         openModal('modal-editar');
+    }
+
+    // CONFIRMAÇÃO DE ELIMINAÇÃO
+    function confirmarEliminacao(nomePaciente) {
+        return confirm("Tem a certeza que deseja eliminar o paciente '" + nomePaciente + "'? Esta ação não pode ser desfeita.");
     }
 
     // fechar ao clicar fora
