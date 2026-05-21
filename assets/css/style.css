@@ -1146,8 +1146,8 @@ footer {
 
     /* tamanho controlado */
     width: auto;
-    max-width: 260px;
-    max-height: 90px;
+    max-width: 300px;
+    max-height: 300px;
 
     height: auto;
     object-fit: contain;
