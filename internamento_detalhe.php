@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once 'includes/db.php';
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) {

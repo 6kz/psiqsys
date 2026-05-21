@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once 'includes/db.php';
 $pagina_atual  = 'observacoes';
 $titulo_pagina = 'Observações Comportamentais';

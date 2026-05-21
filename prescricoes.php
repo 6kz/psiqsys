@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once 'includes/db.php';
 $pagina_atual  = 'prescricoes';
 $titulo_pagina = 'Prescrições';
