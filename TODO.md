@@ -11,6 +11,7 @@
 ### 💊 Prescrições
 
 - [ ] Apenas médicos podem executar ações nas prescrições
+- [ ] Adicionar modal para cancelamento de prescrição (se sim o porquê de ter cancelado)
 
 ### 🛏️ Camas & Internamentos
 
