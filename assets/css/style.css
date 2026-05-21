@@ -1127,25 +1127,33 @@ footer {
 
 .login-brand {
     display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 30px;
-}
-
-.login-logo {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    background: var(--primary);
-    color: #fff;
-    display: flex;
-    align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 18px rgba(26, 86, 219, .28);
+    align-items: center;
+    margin-bottom: 24px;
 }
 
-.login-logo i {
-    font-size: 25px;
+.login-brand img {
+    display: block;
+
+    /* tamanho controlado */
+    width: auto;
+    max-width: 260px;
+    max-height: 90px;
+
+    height: auto;
+    object-fit: contain;
+
+    /* melhora visual */
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, .08));
+
+    transition:
+        transform .2s ease,
+        filter .2s ease;
+}
+
+.login-brand img:hover {
+    transform: scale(1.02);
+    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, .12));
 }
 
 .login-brand h1 {
@@ -1248,4 +1256,10 @@ footer {
         padding: 26px 22px;
         border-radius: 14px;
     }
+
+    .login-brand img {
+        max-width: 210px;
+        max-height: 72px;
+    }
+
 }
