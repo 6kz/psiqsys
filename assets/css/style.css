@@ -38,7 +38,7 @@
 
     /* Layout */
     --sidebar-w: 234px;
-    --topbar-h: 86px;
+    --topbar-h: 81px;
 
     /* Formas */
     --radius: 10px;
@@ -247,7 +247,7 @@ a:hover {
 .topbar {
     height: var(--topbar-h);
     width: 100%;
-    background: rgba(255, 255, 255, .9);
+    background: var(--surface);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
@@ -1271,4 +1271,28 @@ footer {
         max-height: 72px;
     }
 
+}
+
+/* ============================================================
+   DARK MODE
+   ============================================================ */
+
+[data-theme="dark"] {
+    --bg: #0b1220;
+    --surface: #0f172a;
+    --surface-2: #111c33;
+    --surface-3: #16213a;
+
+    --border: #24324a;
+    --border-dark: #334155;
+
+    --text: #e5e7eb;
+    --text-2: #cbd5e1;
+    --text-3: #94a3b8;
+
+    --primary-light: rgba(26, 86, 219, .15);
+
+    --shadow: 0 1px 3px rgba(0, 0, 0, .35);
+    --shadow-md: 0 6px 18px rgba(0, 0, 0, .45);
+    --shadow-lg: 0 12px 30px rgba(0, 0, 0, .55);
 }
