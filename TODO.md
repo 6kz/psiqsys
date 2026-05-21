@@ -11,7 +11,7 @@
 
 - [ ] Apenas médicos podem executar ações nas prescrições
 - [ ] Adicionar modal para cancelamento de prescrição (se sim o porquê de ter cancelado)
-- [?] Quando paciente é desativado devemos cancelar a prescrição?
+- [ ] Quando paciente é desativado devemos cancelar a prescrição?
 
 ### 🛏️ Camas & Internamentos
 
