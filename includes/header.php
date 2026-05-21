@@ -77,11 +77,46 @@
          ════════════════════════════════════════════════════ -->
         <div class="main-content">
 
+            <?php
+            $dias = [
+                'Sunday' => 'Domingo',
+                'Monday' => 'Segunda-feira',
+                'Tuesday' => 'Terça-feira',
+                'Wednesday' => 'Quarta-feira',
+                'Thursday' => 'Quinta-feira',
+                'Friday' => 'Sexta-feira',
+                'Saturday' => 'Sábado'
+            ];
+
+            $meses = [
+                'January' => 'janeiro',
+                'February' => 'fevereiro',
+                'March' => 'março',
+                'April' => 'abril',
+                'May' => 'maio',
+                'June' => 'junho',
+                'July' => 'julho',
+                'August' => 'agosto',
+                'September' => 'setembro',
+                'October' => 'outubro',
+                'November' => 'novembro',
+                'December' => 'dezembro'
+            ];
+
+            $data = $dias[date('l')] . ', ' .
+                date('d') . ' de ' .
+                $meses[date('F')] . ' de ' .
+                date('Y');
+            ?>
+
             <div class="topbar">
-                <div class="page-title"><?= htmlspecialchars($titulo_pagina ?? 'PsiqSys') ?></div>
+                <div class="page-title">
+                    <?= htmlspecialchars($titulo_pagina ?? 'PsiqSys') ?>
+                </div>
+
                 <div class="topbar-right">
                     <span class="topbar-date">
-                        <?= date('l, d \d\e F \d\e Y') ?>
+                        <?= $data ?>
                     </span>
                 </div>
             </div>
