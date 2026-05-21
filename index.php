@@ -36,7 +36,7 @@ if (isset($_POST["btnIniciarSessao"])) {
   } else {
     session_regenerate_id(true);
 
-    $_SESSION['id_utilizador'] = $linha["id_utilizador"];
+    $_SESSION['CurrentID'] = $linha["id_utilizador"];
     $_SESSION['currentNome'] = $linha["nome"];
     $_SESSION['currentLogin'] = $linha["username"];
     $_SESSION['currentFuncao'] = $linha["funcao"];
