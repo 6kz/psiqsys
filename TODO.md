@@ -5,7 +5,7 @@
 ### 👥 Pacientes
 
 - [ ] Permitir à equipa de TI eliminar pacientes
-- [ ] Melhorar a visualização das observações clínicas
+- [ ] Melhorar a visualização das observações clínicas e eventos críticos
 - [ ] Administrativos apenas podem visualizar dados do paciente
 
 ### 💊 Prescrições
