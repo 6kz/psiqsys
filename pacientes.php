@@ -2,6 +2,7 @@
 session_start();
 
 require_once 'includes/db.php';
+require_once 'includes/auditoria.php';
 
 $pagina_atual  = 'pacientes';
 $titulo_pagina = 'Pacientes';
@@ -43,6 +44,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'elimi
         ");
 
         $stmt2->execute([$id_eliminar]);
+
+        // LOG
+        registarLog(
+            $pdo,
+            'PACIENTE',
+            'DELETE',
+            $id_eliminar,
+            $id_eliminar
+        );
 
         $pdo->commit();
 
@@ -110,6 +120,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'novo'
             $morada
         ]);
 
+        $id_paciente = $pdo->lastInsertId();
+
+        // LOG
+        registarLog(
+            $pdo,
+            'PACIENTE',
+            'INSERT',
+            $id_paciente,
+            $id_paciente
+        );
+
         header('Location: pacientes.php?ok=1');
         exit;
     } catch (PDOException $e) {
@@ -123,7 +144,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'novo'
 ========================================================= */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'editar') {
 
+    if (
+        $funcao_atual !== 'ti' &&
+        $funcao_atual !== 'administrativo'
+    ) {
+
+        header('Location: pacientes.php?erro=sem_permissao');
+        exit;
+    }
+
     try {
+
+        $id = (int)$_POST['id'];
 
         $stmt = $pdo->prepare("
             UPDATE PACIENTE
@@ -141,8 +173,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edita
             $_POST['data_nascimento'],
             trim($_POST['contacto'] ?? ''),
             trim($_POST['morada'] ?? ''),
-            (int)$_POST['id']
+            $id
         ]);
+
+        registarLog(
+            $pdo,
+            'PACIENTE',
+            'UPDATE',
+            $id,
+            $id
+        );
 
         header('Location: pacientes.php?ok=edit');
         exit;
@@ -212,6 +252,17 @@ $rows->execute($params);
 
 $rows = $rows->fetchAll();
 
+/* =========================================================
+   LOG CONSULTA
+========================================================= */
+registarLog(
+    $pdo,
+    'PACIENTE',
+    'SELECT',
+    null,
+    null
+);
+
 require_once 'includes/header.php';
 ?>
 
@@ -236,7 +287,6 @@ require_once 'includes/header.php';
 
 <?php endif; ?>
 
-
 <?php if (isset($_GET['erro']) && $_GET['erro'] === 'utente_existente'): ?>
 
     <div class="alert alert-danger mb-4">
@@ -245,7 +295,6 @@ require_once 'includes/header.php';
     </div>
 
 <?php endif; ?>
-
 
 <?php if (isset($_GET['erro']) && $_GET['erro'] === 'utente_invalido'): ?>
 
@@ -256,16 +305,14 @@ require_once 'includes/header.php';
 
 <?php endif; ?>
 
-
 <?php if (isset($_GET['erro']) && $_GET['erro'] === 'sem_permissao'): ?>
 
     <div class="alert alert-danger mb-4">
         <i class="ti ti-alert-circle"></i>
-        Não tem permissões para desativar pacientes.
+        Não tem permissões para esta ação.
     </div>
 
 <?php endif; ?>
-
 
 <div class="flex items-center justify-between mb-4">
 
@@ -308,7 +355,6 @@ require_once 'includes/header.php';
     </button>
 
 </div>
-
 
 <div class="card">
 
@@ -406,20 +452,24 @@ require_once 'includes/header.php';
 
                             <div class="flex gap-2">
 
-                                <button
-                                    type="button"
-                                    class="btn btn-outline btn-sm"
-                                    onclick='abrirEditar(
-                                        <?= $r["id_paciente"] ?>,
-                                        <?= json_encode($r["nome"]) ?>,
-                                        <?= json_encode($r["data_nascimento"]) ?>,
-                                        <?= json_encode($r["contacto"] ?? "") ?>,
-                                        <?= json_encode($r["morada"] ?? "") ?>
-                                    )'>
+                                <?php if ($funcao_atual === 'ti' || $funcao_atual === 'administrativo'): ?>
 
-                                    <i class="ti ti-pencil"></i>
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline btn-sm"
+                                        onclick='abrirEditar(
+                                            <?= $r["id_paciente"] ?>,
+                                            <?= json_encode($r["nome"]) ?>,
+                                            <?= json_encode($r["data_nascimento"]) ?>,
+                                            <?= json_encode($r["contacto"] ?? "") ?>,
+                                            <?= json_encode($r["morada"] ?? "") ?>
+                                        )'>
 
-                                </button>
+                                        <i class="ti ti-pencil"></i>
+
+                                    </button>
+
+                                <?php endif; ?>
 
                                 <?php if ($funcao_atual === 'ti'): ?>
 
@@ -456,23 +506,6 @@ require_once 'includes/header.php';
 
                 <?php endforeach; ?>
 
-                <?php if (empty($rows)): ?>
-
-                    <tr>
-
-                        <td
-                            colspan="8"
-                            class="text-muted text-sm"
-                            style="text-align:center;padding:32px">
-
-                            Nenhum paciente encontrado
-
-                        </td>
-
-                    </tr>
-
-                <?php endif; ?>
-
             </tbody>
 
         </table>
@@ -480,271 +513,6 @@ require_once 'includes/header.php';
     </div>
 
 </div>
-
-
-<!-- ======================================================
-     MODAL NOVO
-====================================================== -->
-
-<div class="modal-overlay" id="modal-novo">
-
-    <div class="modal">
-
-        <div class="modal-header">
-
-            <div class="modal-title">
-                <i class="ti ti-user-plus"></i>
-                Novo Paciente
-            </div>
-
-            <button
-                type="button"
-                class="btn btn-icon btn-outline"
-                onclick="closeModal('modal-novo')">
-
-                <i class="ti ti-x"></i>
-
-            </button>
-
-        </div>
-
-        <form method="post">
-
-            <input type="hidden" name="action" value="novo">
-
-            <div class="modal-body">
-
-                <div class="form-grid">
-
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Nome
-                        </label>
-
-                        <input
-                            type="text"
-                            name="nome"
-                            class="form-control"
-                            required>
-
-                    </div>
-
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Data Nascimento
-                        </label>
-
-                        <input
-                            type="date"
-                            name="data_nascimento"
-                            class="form-control"
-                            required>
-
-                    </div>
-
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Nº Utente
-                        </label>
-
-                        <input
-                            type="text"
-                            name="num_utente"
-                            maxlength="9"
-                            class="form-control"
-                            required>
-
-                    </div>
-
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Contacto
-                        </label>
-
-                        <input
-                            type="text"
-                            name="contacto"
-                            class="form-control">
-
-                    </div>
-
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Morada
-                        </label>
-
-                        <textarea
-                            name="morada"
-                            class="form-control"></textarea>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="modal-footer">
-
-                <button
-                    type="button"
-                    class="btn btn-outline"
-                    onclick="closeModal('modal-novo')">
-
-                    Cancelar
-
-                </button>
-
-                <button
-                    type="submit"
-                    class="btn btn-primary">
-
-                    <i class="ti ti-device-floppy"></i>
-                    Guardar
-
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
-
-
-<!-- ======================================================
-     MODAL EDITAR
-====================================================== -->
-
-<div class="modal-overlay" id="modal-editar">
-
-    <div class="modal">
-
-        <div class="modal-header">
-
-            <div class="modal-title">
-                <i class="ti ti-pencil"></i>
-                Editar Paciente
-            </div>
-
-            <button
-                type="button"
-                class="btn btn-icon btn-outline"
-                onclick="closeModal('modal-editar')">
-
-                <i class="ti ti-x"></i>
-
-            </button>
-
-        </div>
-
-        <form method="post">
-
-            <input type="hidden" name="action" value="editar">
-
-            <input
-                type="hidden"
-                name="id"
-                id="edit-id">
-
-            <div class="modal-body">
-
-                <div class="form-grid">
-
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Nome
-                        </label>
-
-                        <input
-                            type="text"
-                            name="nome"
-                            id="edit-nome"
-                            class="form-control"
-                            required>
-
-                    </div>
-
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Data Nascimento
-                        </label>
-
-                        <input
-                            type="date"
-                            name="data_nascimento"
-                            id="edit-data"
-                            class="form-control"
-                            required>
-
-                    </div>
-
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Contacto
-                        </label>
-
-                        <input
-                            type="text"
-                            name="contacto"
-                            id="edit-contacto"
-                            class="form-control">
-
-                    </div>
-
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Morada
-                        </label>
-
-                        <textarea
-                            name="morada"
-                            id="edit-morada"
-                            class="form-control"></textarea>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="modal-footer">
-
-                <button
-                    type="button"
-                    class="btn btn-outline"
-                    onclick="closeModal('modal-editar')">
-
-                    Cancelar
-
-                </button>
-
-                <button
-                    type="submit"
-                    class="btn btn-primary">
-
-                    <i class="ti ti-device-floppy"></i>
-                    Guardar Alterações
-
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
-
 
 <script>
     function openModal(id) {
@@ -788,40 +556,108 @@ require_once 'includes/header.php';
             "'?"
         );
     }
-
-    /* =========================================================
-       FECHAR AO CLICAR FORA
-    ========================================================= */
-
-    document.querySelectorAll('.modal-overlay').forEach(modal => {
-
-        modal.addEventListener('click', function(e) {
-
-            if (e.target === modal) {
-
-                modal.classList.remove('open');
-
-                document.body.style.overflow = '';
-            }
-        });
-    });
-
-    /* =========================================================
-       ESC FECHA MODAL
-    ========================================================= */
-
-    document.addEventListener('keydown', function(e) {
-
-        if (e.key === 'Escape') {
-
-            document.querySelectorAll('.modal-overlay.open').forEach(modal => {
-
-                modal.classList.remove('open');
-            });
-
-            document.body.style.overflow = '';
-        }
-    });
 </script>
+
+<!-- MODAL EDITAR -->
+<div class="modal-overlay" id="modal-editar">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <h3>
+                <i class="ti ti-pencil"></i>
+                Editar Paciente
+            </h3>
+
+            <button
+                type="button"
+                class="btn btn-outline btn-sm"
+                onclick="closeModal('modal-editar')">
+
+                <i class="ti ti-x"></i>
+
+            </button>
+
+        </div>
+
+        <form method="post" action="pacientes.php">
+
+            <input type="hidden" name="action" value="editar">
+
+            <input type="hidden" name="id" id="edit-id">
+
+            <div class="form-group">
+
+                <label>Nome</label>
+
+                <input
+                    type="text"
+                    name="nome"
+                    id="edit-nome"
+                    required>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Data de Nascimento</label>
+
+                <input
+                    type="date"
+                    name="data_nascimento"
+                    id="edit-data"
+                    required>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Contacto</label>
+
+                <input
+                    type="text"
+                    name="contacto"
+                    id="edit-contacto">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Morada</label>
+
+                <textarea
+                    name="morada"
+                    id="edit-morada"></textarea>
+
+            </div>
+
+            <div class="flex justify-end gap-2 mt-4">
+
+                <button
+                    type="button"
+                    class="btn btn-outline"
+                    onclick="closeModal('modal-editar')">
+
+                    Cancelar
+
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+
+                    <i class="ti ti-device-floppy"></i>
+                    Guardar
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
 
 <?php require_once 'includes/footer.php'; ?>
