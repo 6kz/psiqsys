@@ -6,6 +6,7 @@
 
 - [ ] Melhorar a visualização das observações clínicas e eventos críticos
 - [ ] Administrativos apenas podem visualizar dados do paciente
+- [ ] Mostrar pacientes desativos com tag desativo (SÓ COM BUSCA)
 
 ### 💊 Prescrições
 
