@@ -5,7 +5,6 @@
 ### 👥 Pacientes
 
 - [ ] Melhorar a visualização das observações clínicas e eventos críticos
-- [ ] Administrativos apenas podem visualizar dados do paciente
 - [ ] Mostrar pacientes desativos com tag desativo (SÓ COM BUSCA)
 
 ### 💊 Prescrições
@@ -18,6 +17,7 @@
 
 - [ ] Permitir aos enfermeiros gerir camas e quartos
 - [ ] Mudar fonte de dark mode
+- [ ] Adicionar diárias aos internamentos
 
 ### 🔐 Sistema
 
@@ -27,6 +27,9 @@
 - [ ] Conseguir por o auditoria.php a funcionar em todas as paginas
 - [ ] Criar um user para cada um
 - [ ] Criar página de administração de medicação
+- [ ] Ter uma forma de ocultar dados sensíveis (Oculto), OnClick aparecia
+- [ ] Administrativos apenas podem visualizar dados do paciente, e internamento
+
 
 ---
 

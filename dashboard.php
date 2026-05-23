@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+if (isset($_SESSION['currentFuncao']) && ($_SESSION['currentFuncao'] === 'administrativo' || $_SESSION['currentFuncao'] === 'administrative')) {
+    header('Location: pacientes.php?erro=sem_permissao');
+    exit;
+}
+
 // Verifica se existe sessão iniciada
 if (!isset($_SESSION['currentID']) || !isset($_SESSION['currentLogin'])) {
     // destrói qualquer sessão residual

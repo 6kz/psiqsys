@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+if (isset($_SESSION['currentFuncao']) && ($_SESSION['currentFuncao'] === 'administrativo' || $_SESSION['currentFuncao'] === 'administrative')) {
+    header('Location: pacientes.php?erro=sem_permissao');
+    exit;
+}
+
 require_once 'includes/db.php';
 $pagina_atual  = 'observacoes';
 $titulo_pagina = 'Observações Comportamentais';
