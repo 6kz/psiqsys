@@ -115,129 +115,127 @@ $camas_disp = $pdo->query("SELECT c.id_cama, q.numero_quarto, c.numero_cama, s.n
 require_once 'includes/header.php';
 ?>
 
-<?php if (isset($_GET['ok'])): ?>
-    <?php if (isset($_GET['erro'])): ?>
-        <div class="alert alert-danger mb-4">
-            <i class="ti ti-alert-circle"></i>
+<div class="content-area">
 
-            <?php
-            switch ($_GET['erro']) {
-
-                case 'cama_ocupada':
-                    echo 'A cama selecionada já se encontra ocupada.';
-                    break;
-
-                case 'cama_indisponivel':
-                    echo 'A cama selecionada não está disponível.';
-                    break;
-
-                default:
-                    echo 'Ocorreu um erro ao criar o internamento.';
-            }
-            ?>
+    <?php if (isset($_GET['ok'])): ?>
+        <?php if (isset($_GET['erro'])): ?>
+            <div class="alert alert-danger mb-4">
+                <i class="ti ti-alert-circle"></i>
+                <?php
+                switch ($_GET['erro']) {
+                    case 'cama_ocupada':
+                        echo 'A cama selecionada já se encontra ocupada.';
+                        break;
+                    case 'cama_indisponivel':
+                        echo 'A cama selecionada não está disponível.';
+                        break;
+                    default:
+                        echo 'Ocorreu um erro ao criar o internamento.';
+                }
+                ?>
+            </div>
+        <?php endif; ?>
+        <div class="alert alert-success mb-4">
+            <i class="ti ti-circle-check"></i>
+            <?= $_GET['ok'] === 'alta' ? 'Alta clínica registada com sucesso.' : 'Internamento criado com sucesso.' ?>
         </div>
     <?php endif; ?>
-    <div class="alert alert-success mb-4">
-        <i class="ti ti-circle-check"></i>
-        <?= $_GET['ok'] === 'alta' ? 'Alta clínica registada com sucesso.' : 'Internamento criado com sucesso.' ?>
-    </div>
-<?php endif; ?>
 
-<div class="flex items-center justify-between mb-4">
-    <div class="flex gap-2">
-        <a href="?filtro=ativos<?= $search ? '&q=' . urlencode($search) : '' ?>"
-            class="btn <?= $filtro !== 'todos' ? 'btn-primary' : 'btn-outline' ?> btn-sm">Ativos</a>
-        <a href="?filtro=todos<?= $search ? '&q=' . urlencode($search) : '' ?>"
-            class="btn <?= $filtro === 'todos' ? 'btn-primary' : 'btn-outline' ?> btn-sm">Todos</a>
+    <div class="flex items-center justify-between mb-4">
+        <div class="flex gap-2">
+            <a href="?filtro=ativos<?= $search ? '&q=' . urlencode($search) : '' ?>"
+                class="btn <?= $filtro !== 'todos' ? 'btn-primary' : 'btn-outline' ?> btn-sm">Ativos</a>
+            <a href="?filtro=todos<?= $search ? '&q=' . urlencode($search) : '' ?>"
+                class="btn <?= $filtro === 'todos' ? 'btn-primary' : 'btn-outline' ?> btn-sm">Todos</a>
+        </div>
+        <div class="flex gap-3 items-center">
+            <form method="get" style="display:flex;gap:8px;align-items:center">
+                <input type="hidden" name="filtro" value="<?= htmlspecialchars($filtro) ?>">
+                <div class="search-bar">
+                    <i class="ti ti-search"></i>
+                    <input type="text" name="q" placeholder="Pesquisar paciente…" value="<?= htmlspecialchars($search) ?>">
+                </div>
+            </form>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-novo')">
+                <i class="ti ti-plus"></i> Novo Internamento
+            </button>
+        </div>
     </div>
-    <div class="flex gap-3 items-center">
-        <form method="get" style="display:flex;gap:8px;align-items:center">
-            <input type="hidden" name="filtro" value="<?= htmlspecialchars($filtro) ?>">
-            <div class="search-bar">
-                <i class="ti ti-search"></i>
-                <input type="text" name="q" placeholder="Pesquisar paciente…" value="<?= htmlspecialchars($search) ?>">
-            </div>
-        </form>
-        <button class="btn btn-primary btn-sm" onclick="openModal('modal-novo')">
-            <i class="ti ti-plus"></i> Novo Internamento
-        </button>
-    </div>
-</div>
 
-<div class="card">
-    <div class="card-header">
-        <span class="card-title"><i class="ti ti-bed"></i> Internamentos <?= $filtro === 'todos' ? '(todos)' : 'Ativos' ?></span>
-        <span class="text-sm text-muted"><?= count($rows) ?> registos</span>
-    </div>
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Paciente</th>
-                    <th>Serviço / Cama</th>
-                    <th>Admissão</th>
-                    <th>Episódio</th>
-                    <th>Risco Suic.</th>
-                    <th>Estado</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($rows as $r): ?>
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title"><i class="ti ti-bed"></i> Internamentos <?= $filtro === 'todos' ? '(todos)' : 'Ativos' ?></span>
+            <span class="text-sm text-muted"><?= count($rows) ?> registos</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
                     <tr>
-                        <td class="mono text-muted"><?= $r['id_internamento'] ?></td>
-                        <td>
-                            <div class="fw-600"><?= htmlspecialchars($r['paciente']) ?></div>
-                            <div class="mono text-sm text-muted"><?= $r['num_utente'] ?></div>
-                        </td>
-                        <td>
-                            <div><?= htmlspecialchars($r['servico']) ?></div>
-                            <div class="text-sm text-muted">Q<?= $r['numero_quarto'] ?> / C<?= $r['numero_cama'] ?></div>
-                        </td>
-                        <td class="mono text-sm"><?= date('d/m/Y H:i', strtotime($r['data_admissao'])) ?></td>
-                        <td><span class="badge badge-blue"><?= $r['tipo_episodio'] ?></span></td>
-                        <td>
-                            <?php
-                            $rc = ['nenhum' => 'gray', 'baixo' => 'green', 'moderado' => 'amber', 'elevado' => 'red', 'iminente' => 'red'];
-                            echo '<span class="badge badge-' . ($rc[$r['risco_suicidario']] ?? 'gray') . '">' . $r['risco_suicidario'] . '</span>';
-                            ?>
-                        </td>
-                        <td>
-                            <?php
-                            $ec = ['instavel' => 'red', 'estabilizando' => 'amber', 'estavel' => 'green', 'alta_prevista' => 'cyan'];
-                            echo '<span class="badge badge-' . ($ec[$r['estado_clinico']] ?? 'gray') . '">' . $r['estado_clinico'] . '</span>';
-                            ?>
-                        </td>
-                        <td>
-                            <div class="flex gap-2">
-                                <a href="internamento_detalhe.php?id=<?= $r['id_internamento'] ?>" class="btn btn-outline btn-sm">
-                                    <i class="ti ti-eye"></i>
-                                </a>
-                                <?php if (is_null($r['data_alta'])): ?>
-                                    <form method="post" onsubmit="return confirm('Confirmar alta clínica?')">
-                                        <input type="hidden" name="action" value="alta">
-                                        <input type="hidden" name="id" value="<?= $r['id_internamento'] ?>">
-                                        <button class="btn btn-success btn-sm"><i class="ti ti-logout"></i> Alta</button>
-                                    </form>
-                                <?php else: ?>
-                                    <span class="text-sm text-muted mono"><?= date('d/m/Y', strtotime($r['data_alta'])) ?></span>
-                                <?php endif; ?>
-                            </div>
-                        </td>
+                        <th>#</th>
+                        <th>Paciente</th>
+                        <th>Serviço / Cama</th>
+                        <th>Admissão</th>
+                        <th>Episódio</th>
+                        <th>Risco Suic.</th>
+                        <th>Estado</th>
+                        <th>Ações</th>
                     </tr>
-                <?php endforeach; ?>
-                <?php if (empty($rows)): ?>
-                    <tr>
-                        <td colspan="8" style="text-align:center;padding:32px" class="text-muted">Nenhum registo encontrado</td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($rows as $r): ?>
+                        <tr>
+                            <td class="mono text-muted"><?= $r['id_internamento'] ?></td>
+                            <td>
+                                <div class="fw-600"><?= htmlspecialchars($r['paciente']) ?></div>
+                                <div class="mono text-sm text-muted"><?= $r['num_utente'] ?></div>
+                            </td>
+                            <td>
+                                <div><?= htmlspecialchars($r['servico']) ?></div>
+                                <div class="text-sm text-muted">Q<?= $r['numero_quarto'] ?> / C<?= $r['numero_cama'] ?></div>
+                            </td>
+                            <td class="mono text-sm"><?= date('d/m/Y H:i', strtotime($r['data_admissao'])) ?></td>
+                            <td><span class="badge badge-blue"><?= $r['tipo_episodio'] ?></span></td>
+                            <td>
+                                <?php
+                                $rc = ['nenhum' => 'gray', 'baixo' => 'green', 'moderado' => 'amber', 'elevado' => 'red', 'iminente' => 'red'];
+                                echo '<span class="badge badge-' . ($rc[$r['risco_suicidario']] ?? 'gray') . '">' . $r['risco_suicidario'] . '</span>';
+                                ?>
+                            </td>
+                            <td>
+                                <?php
+                                $ec = ['instavel' => 'red', 'estabilizando' => 'amber', 'estavel' => 'green', 'alta_prevista' => 'cyan'];
+                                echo '<span class="badge badge-' . ($ec[$r['estado_clinico']] ?? 'gray') . '">' . $r['estado_clinico'] . '</span>';
+                                ?>
+                            </td>
+                            <td>
+                                <div class="flex gap-2">
+                                    <a href="internamento_detalhes.php?id=<?= $r['id_internamento'] ?>" class="btn btn-outline btn-sm">
+                                        <i class="ti ti-eye"></i>
+                                    </a>
+                                    <?php if (is_null($r['data_alta'])): ?>
+                                        <form method="post" onsubmit="return confirm('Confirmar alta clínica?')">
+                                            <input type="hidden" name="action" value="alta">
+                                            <input type="hidden" name="id" value="<?= $r['id_internamento'] ?>">
+                                            <button class="btn btn-success btn-sm"><i class="ti ti-logout"></i> Alta</button>
+                                        </form>
+                                    <?php else: ?>
+                                        <span class="text-sm text-muted mono"><?= date('d/m/Y', strtotime($r['data_alta'])) ?></span>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php if (empty($rows)): ?>
+                        <tr>
+                            <td colspan="8" style="text-align:center;padding:32px" class="text-muted">Nenhum registo encontrado</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 
-<!-- Modal Novo Internamento -->
+</div>
 <div class="modal-overlay" id="modal-novo">
     <div class="modal">
         <div class="modal-header">

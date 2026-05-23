@@ -1,12 +1,13 @@
 <?php
 session_start();
 
-// Verifica se existe sessão iniciada
-if (
-    !isset($_SESSION['currentID']) ||
-    !isset($_SESSION['currentLogin'])
-) {
+if (isset($_SESSION['currentFuncao']) && ($_SESSION['currentFuncao'] === 'administrativo' || $_SESSION['currentFuncao'] === 'administrative')) {
+    header('Location: pacientes.php?erro=sem_permissao');
+    exit;
+}
 
+// Verifica se existe sessão iniciada
+if (!isset($_SESSION['currentID']) || !isset($_SESSION['currentLogin'])) {
     // destrói qualquer sessão residual
     session_unset();
     session_destroy();
@@ -68,6 +69,7 @@ function risco_badge(string $r): string
     ];
     return '<span class="badge badge-' . ($map[$r] ?? 'gray') . '">' . $r . '</span>';
 }
+
 function humor_badge(string $h): string
 {
     $map = ['eutimico' => 'green', 'deprimido' => 'blue', 'expansivo' => 'amber', 'irritavel' => 'red', 'ansioso' => 'amber', 'labil' => 'red'];
@@ -75,134 +77,139 @@ function humor_badge(string $h): string
 }
 ?>
 
-<div class="stats-grid">
-    <div class="stat-card blue">
-        <div class="stat-icon"><i class="ti ti-bed" style="color:var(--primary)"></i></div>
-        <div class="stat-label">Internamentos Ativos</div>
-        <div class="stat-value"><?= $internamentos_ativos ?></div>
-    </div>
-    <div class="stat-card green">
-        <div class="stat-icon"><i class="ti ti-users" style="color:var(--success)"></i></div>
-        <div class="stat-label">Total Pacientes</div>
-        <div class="stat-value"><?= $total_pacientes ?></div>
-    </div>
-    <div class="stat-card cyan">
-        <div class="stat-icon"><i class="ti ti-building-hospital" style="color:var(--info)"></i></div>
-        <div class="stat-label">Camas Disponíveis</div>
-        <div class="stat-value"><?= $camas_disponiveis ?></div>
-        <div class="stat-sub"><?= $camas_ocupadas ?> ocupadas</div>
-    </div>
-    <div class="stat-card amber">
-        <div class="stat-icon"><i class="ti ti-pill" style="color:var(--warning)"></i></div>
-        <div class="stat-label">Prescrições Ativas</div>
-        <div class="stat-value"><?= $prescricoes_ativas ?></div>
-    </div>
-    <div class="stat-card red">
-        <div class="stat-icon"><i class="ti ti-alert-triangle" style="color:var(--danger)"></i></div>
-        <div class="stat-label">Eventos Críticos Hoje</div>
-        <div class="stat-value"><?= $eventos_hoje ?></div>
-    </div>
-</div>
+<div class="content-area">
 
-<!-- Alertas de risco -->
-<?php if (!empty($riscos)): ?>
-    <div class="alert alert-danger mb-4">
-        <i class="ti ti-alert-octagon"></i>
-        <div>
-            <strong><?= count($riscos) ?> paciente(s) com risco suicidário elevado ou iminente</strong>
-            <?php foreach ($riscos as $r): ?>
-                <div class="text-sm mt-1">
-                    <strong><?= htmlspecialchars($r['nome']) ?></strong> — Quarto <?= $r['numero_quarto'] ?>/Cama <?= $r['numero_cama'] ?>
-                    &nbsp;<?= risco_badge($r['risco_suicidario']) ?>&nbsp;<?= risco_badge($r['risco_agressividade']) ?>
-                </div>
-            <?php endforeach; ?>
+    <div class="stats-grid">
+        <div class="stat-card blue">
+            <div class="stat-icon"><i class="ti ti-bed" style="color:var(--primary)"></i></div>
+            <div class="stat-label">Internamentos Ativos</div>
+            <div class="stat-value"><?= $internamentos_ativos ?></div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="ti ti-users" style="color:var(--success)"></i></div>
+            <div class="stat-label">Total Pacientes</div>
+            <div class="stat-value"><?= $total_pacientes ?></div>
+        </div>
+        <div class="stat-card cyan">
+            <div class="stat-icon"><i class="ti ti-building-hospital" style="color:var(--info)"></i></div>
+            <div class="stat-label">Camas Disponíveis</div>
+            <div class="stat-value"><?= $camas_disponiveis ?></div>
+            <div class="stat-sub"><?= $camas_ocupadas ?> ocupadas</div>
+        </div>
+        <div class="stat-card amber">
+            <div class="stat-icon"><i class="ti ti-pill" style="color:var(--warning)"></i></div>
+            <div class="stat-label">Prescrições Ativas</div>
+            <div class="stat-value"><?= $prescricoes_ativas ?></div>
+        </div>
+        <div class="stat-card red">
+            <div class="stat-icon"><i class="ti ti-alert-triangle" style="color:var(--danger)"></i></div>
+            <div class="stat-label">Eventos Críticos Hoje</div>
+            <div class="stat-value"><?= $eventos_hoje ?></div>
         </div>
     </div>
-<?php endif; ?>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-
-    <!-- Internamentos ativos -->
-    <div class="card">
-        <div class="card-header">
-            <span class="card-title"><i class="ti ti-bed"></i> Internamentos Ativos</span>
-            <a href="internamentos.php" class="btn btn-outline btn-sm">Ver todos</a>
+    <?php if (!empty($riscos)): ?>
+        <div class="alert alert-danger mb-4">
+            <i class="ti ti-alert-octagon"></i>
+            <div>
+                <strong><?= count($riscos) ?> paciente(s) com risco suicidário elevado ou iminente</strong>
+                <?php foreach ($riscos as $r): ?>
+                    <div class="text-sm mt-1">
+                        <strong><?= htmlspecialchars($r['nome']) ?></strong> — Quarto <?= $r['numero_quarto'] ?>/Cama <?= $r['numero_cama'] ?>
+                        &nbsp;<?= risco_badge($r['risco_suicidario']) ?>&nbsp;<?= risco_badge($r['risco_agressividade']) ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </div>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Paciente</th>
-                        <th>Quarto</th>
-                        <th>Episódio</th>
-                        <th>Risco</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($ativos as $a): ?>
+    <?php endif; ?>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title"><i class="ti ti-bed"></i> Internamentos Ativos</span>
+                <a href="internamentos.php" class="btn btn-outline btn-sm">Ver todos</a>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
                         <tr>
-                            <td>
-                                <div class="fw-600"><?= htmlspecialchars($a['paciente']) ?></div>
-                                <div class="text-sm text-muted mono"><?= $a['num_utente'] ?></div>
-                            </td>
-                            <td><?= $a['numero_quarto'] ?>/<?= $a['numero_cama'] ?></td>
-                            <td><span class="badge badge-blue"><?= $a['tipo_episodio'] ?></span></td>
-                            <td><?= risco_badge($a['risco_suicidario']) ?></td>
-                            <td>
-                                <?php
-                                $ec = ['instavel' => 'red', 'estabilizando' => 'amber', 'estavel' => 'green', 'alta_prevista' => 'cyan'];
-                                echo '<span class="badge badge-' . ($ec[$a['estado_clinico']] ?? 'gray') . '">' . $a['estado_clinico'] . '</span>';
-                                ?>
-                            </td>
+                            <th>Paciente</th>
+                            <th>Quarto</th>
+                            <th>Episódio</th>
+                            <th>Risco</th>
+                            <th>Estado</th>
                         </tr>
-                    <?php endforeach; ?>
-                    <?php if (empty($ativos)): ?><tr>
-                            <td colspan="5" class="text-muted text-sm" style="text-align:center;padding:24px">Sem internamentos ativos</td>
-                        </tr><?php endif; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($ativos as $a): ?>
+                            <tr>
+                                <td>
+                                    <div class="fw-600"><?= htmlspecialchars($a['paciente']) ?></div>
+                                    <div class="text-sm text-muted mono"><?= $a['num_utente'] ?></div>
+                                </td>
+                                <td><?= $a['numero_quarto'] ?>/<?= $a['numero_cama'] ?></td>
+                                <td><span class="badge badge-blue"><?= $a['tipo_episodio'] ?></span></td>
+                                <td><?= risco_badge($a['risco_suicidario']) ?></td>
+                                <td>
+                                    <?php
+                                    $ec = ['instavel' => 'red', 'estabilizando' => 'amber', 'estavel' => 'green', 'alta_prevista' => 'cyan'];
+                                    echo '<span class="badge badge-' . ($ec[$a['estado_clinico']] ?? 'gray') . '">' . $a['estado_clinico'] . '</span>';
+                                    ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        <?php if (empty($ativos)): ?>
+                            <tr>
+                                <td colspan="5" class="text-muted text-sm" style="text-align:center; padding:24px">Sem internamentos ativos</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
-    <!-- Últimas observações -->
-    <div class="card">
-        <div class="card-header">
-            <span class="card-title"><i class="ti ti-clipboard-list"></i> Últimas Observações</span>
-            <a href="observacoes.php" class="btn btn-outline btn-sm">Ver todas</a>
-        </div>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Paciente</th>
-                        <th>Humor</th>
-                        <th>Adesão</th>
-                        <th>Hora</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($obs as $o): ?>
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title"><i class="ti ti-clipboard-list"></i> Últimas Observações</span>
+                <a href="observacoes.php" class="btn btn-outline btn-sm">Ver todas</a>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
                         <tr>
-                            <td>
-                                <div class="fw-600"><?= htmlspecialchars($o['paciente']) ?></div>
-                                <div class="text-sm text-muted"><?= htmlspecialchars($o['profissional']) ?></div>
-                            </td>
-                            <td><?= humor_badge($o['humor']) ?></td>
-                            <td>
-                                <?php
-                                $am = ['total' => 'green', 'parcial' => 'amber', 'recusa' => 'red'];
-                                echo '<span class="badge badge-' . ($am[$o['adesao_terapeutica']] ?? 'gray') . '">' . $o['adesao_terapeutica'] . '</span>';
-                                ?>
-                            </td>
-                            <td class="text-sm text-muted mono"><?= date('d/m H:i', strtotime($o['data_hora'])) ?></td>
+                            <th>Paciente</th>
+                            <th>Humor</th>
+                            <th>Adesão</th>
+                            <th>Hora</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($obs as $o): ?>
+                            <tr>
+                                <td>
+                                    <div class="fw-600"><?= htmlspecialchars($o['paciente']) ?></div>
+                                    <div class="text-sm text-muted"><?= htmlspecialchars($o['profissional']) ?></div>
+                                </td>
+                                <td><?= humor_badge($o['humor']) ?></td>
+                                <td>
+                                    <?php
+                                    $am = ['total' => 'green', 'parcial' => 'amber', 'recusa' => 'red'];
+                                    echo '<span class="badge badge-' . ($am[$o['adesao_terapeutica']] ?? 'gray') . '">' . $o['adesao_terapeutica'] . '</span>';
+                                    ?>
+                                </td>
+                                <td class="text-sm text-muted mono"><?= date('d/m H:i', strtotime($o['data_hora'])) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        <?php if (empty($obs)): ?>
+                            <tr>
+                                <td colspan="4" class="text-muted text-sm" style="text-align:center; padding:24px">Sem observações registadas</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
+
     </div>
-
-</div>
-
-<?php require_once 'includes/footer.php'; ?>
+</div> <?php require_once 'includes/footer.php'; ?>

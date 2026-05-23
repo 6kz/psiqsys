@@ -41,7 +41,7 @@
     --topbar-h: 81px;
 
     /* Formas — ligeiramente mais arredondadas */
-    --radius: 12px;
+    --radius: 14px;
     --radius-sm: 8px;
     --radius-xs: 5px;
 
@@ -103,7 +103,7 @@ a:hover {
 }
 
 /* ============================================================
-   LAYOUT
+    LAYOUT
    ============================================================ */
 .layout {
     display: grid;
@@ -112,7 +112,7 @@ a:hover {
 }
 
 /* ============================================================
-   SIDEBAR — mais refinada, mesma estrutura
+    SIDEBAR — mais refinada, mesma estrutura
    ============================================================ */
 .sidebar {
     background: #08121f;
@@ -248,7 +248,7 @@ a:hover {
 }
 
 /* ============================================================
-   MAIN CONTENT
+    MAIN CONTENT
    ============================================================ */
 .main-content {
     grid-column: 2;
@@ -319,7 +319,7 @@ a:hover {
 }
 
 /* ============================================================
-   CARDS
+    CARDS
    ============================================================ */
 .card {
     background: var(--surface);
@@ -365,7 +365,7 @@ a:hover {
 }
 
 /* ============================================================
-   STAT CARDS — acento superior mais expressivo
+    STAT CARDS — acento superior mais expressivo
    ============================================================ */
 .stats-grid {
     display: grid;
@@ -389,7 +389,6 @@ a:hover {
     overflow: hidden;
 }
 
-/* Reflexo de cor no fundo — muito subtil */
 .stat-card.blue::before {
     content: '';
     position: absolute;
@@ -461,7 +460,6 @@ a:hover {
     margin-bottom: 6px;
 }
 
-/* Variantes */
 .stat-card.blue {
     border-top-color: var(--primary);
 }
@@ -503,7 +501,7 @@ a:hover {
 }
 
 /* ============================================================
-   TABLES
+    TABLES
    ============================================================ */
 .table-wrap {
     width: 100%;
@@ -547,7 +545,7 @@ tbody tr:hover td {
 }
 
 /* ============================================================
-   BADGES — pill com borda subtil, mais legíveis
+    BADGES
    ============================================================ */
 .badge {
     display: inline-flex;
@@ -600,7 +598,7 @@ tbody tr:hover td {
 }
 
 /* ============================================================
-   BUTTONS
+    BUTTONS
    ============================================================ */
 .btn {
     display: inline-flex;
@@ -619,11 +617,6 @@ tbody tr:hover td {
     user-select: none;
     text-decoration: none;
     letter-spacing: -.01em;
-}
-
-.btn:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
 }
 
 .btn:active {
@@ -689,7 +682,7 @@ tbody tr:hover td {
 }
 
 /* ============================================================
-   FORMS
+    FORMS
    ============================================================ */
 .form-grid {
     display: grid;
@@ -707,11 +700,11 @@ tbody tr:hover td {
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
 }
 
 .form-label {
-    font-size: .8rem;
+    font-size: .85rem;
     font-weight: 600;
     color: var(--text-2);
     letter-spacing: -.005em;
@@ -719,14 +712,14 @@ tbody tr:hover td {
 
 .form-control {
     width: 100%;
-    padding: 8px 12px;
+    padding: 10px 14px;
     border: 1px solid var(--border-dark);
     border-radius: var(--radius-sm);
     font-family: var(--font);
-    font-size: .858rem;
-    background: var(--surface);
+    font-size: .9rem;
+    background: var(--surface-2);
     color: var(--text);
-    transition: border-color var(--transition), box-shadow var(--transition);
+    transition: all var(--transition);
 }
 
 .form-control:hover {
@@ -735,20 +728,20 @@ tbody tr:hover td {
 
 .form-control:focus {
     outline: none;
+    background: var(--surface);
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, .1);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
 }
 
-.form-control:disabled,
-.form-control[disabled] {
-    background: var(--surface-2);
+.form-control:disabled, .form-control[disabled] {
+    background: #f1f5f9 !important;
     color: var(--text-3);
     cursor: not-allowed;
     opacity: .75;
 }
 
 textarea.form-control {
-    min-height: 88px;
+    min-height: 90px;
     resize: vertical;
 }
 
@@ -758,7 +751,7 @@ select.form-control {
 }
 
 /* ============================================================
-   ALERTS
+    ALERTS
    ============================================================ */
 .alert {
     padding: 12px 16px;
@@ -796,7 +789,7 @@ select.form-control {
 }
 
 /* ============================================================
-   UTILITIES
+    UTILITIES
    ============================================================ */
 .flex {
     display: flex;
@@ -856,94 +849,106 @@ select.form-control {
 }
 
 /* ============================================================
-   MODAL
+    MODAL (Estilo Moderno Shadcn / Tailwind Redesenhado)
    ============================================================ */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(8, 18, 31, .55);
-    backdrop-filter: blur(4px);
-    display: flex;
+    background: rgba(15, 23, 42, 0.45);
+    /* Backdrop cinza ardósia sofisticado */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 200;
     opacity: 0;
-    pointer-events: none;
-    transition: opacity .2s ease;
-    padding: 20px;
+    transition: opacity 0.2s ease-in-out;
+    padding: 24px;
 }
 
 .modal-overlay.open {
+    display: flex;
     opacity: 1;
-    pointer-events: all;
 }
 
 .modal {
     background: var(--surface);
     border-radius: var(--radius);
     width: 100%;
-    max-width: 600px;
+    max-width: 520px;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: var(--shadow-lg);
-    animation: modal-in .22s var(--ease) forwards;
     border: 1px solid var(--border);
+    transform: scale(0.96) translateY(8px);
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
 }
 
-.modal-overlay:not(.open) .modal {
-    animation: none;
+.modal-overlay.open .modal {
+    transform: scale(1) translateY(0);
 }
 
-@keyframes modal-in {
-    from {
-        transform: translateY(14px) scale(.985);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
-}
-
+/* Padding interno estruturado e idêntico para todas as secções */
 .modal-header {
-    padding: 16px 20px;
+    padding: 24px 24px 18px 24px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    position: sticky;
-    top: 0;
-    background: var(--surface-2);
-    z-index: 1;
-}
-
-.modal-title {
-    font-size: .95rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    letter-spacing: -.01em;
-}
-
-.modal-body {
-    padding: 20px;
-}
-
-.modal-footer {
-    padding: 14px 20px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    position: sticky;
-    bottom: 0;
     background: var(--surface);
 }
 
+.modal-title, .modal-header h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: -.02em;
+}
+
+.modal-body, .modal form {
+    padding: 24px;
+}
+
+.modal-footer {
+    padding: 16px 24px 24px 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    background: var(--surface);
+}
+
+/* Elementos do formulário específicos do Modal para herdar o padding */
+.modal .form-group {
+    margin-bottom: 18px;
+}
+
+.modal .form-group:last-of-type {
+    margin-bottom: 24px;
+}
+
+/* X de fechar o topo do modal */
+.modal-header .btn-outline.btn-sm {
+    background: transparent;
+    border: none;
+    color: var(--text-3);
+    padding: 6px;
+    border-radius: 6px;
+}
+
+.modal-header .btn-outline.btn-sm:hover {
+    background: var(--surface-3);
+    color: var(--text);
+}
+
 /* ============================================================
-   RISK INDICATORS
+    RISK INDICATORS
    ============================================================ */
 .risk-dot {
     width: 8px;
@@ -988,7 +993,7 @@ select.form-control {
 }
 
 /* ============================================================
-   SEARCH BAR
+    SEARCH BAR
    ============================================================ */
 .search-bar {
     position: relative;
@@ -1024,7 +1029,7 @@ select.form-control {
 }
 
 /* ============================================================
-   PAGINATION
+    PAGINATION
    ============================================================ */
 .pagination {
     display: flex;
@@ -1061,7 +1066,7 @@ select.form-control {
 }
 
 /* ============================================================
-   FOOTER
+    FOOTER
    ============================================================ */
 footer {
     margin-left: 0;
@@ -1077,14 +1082,11 @@ footer {
 }
 
 /* ============================================================
-   LOGIN PAGE
+    LOGIN PAGE
    ============================================================ */
 .login-page {
     min-height: 100vh;
-    background:
-        radial-gradient(circle at top left, rgba(37, 99, 235, .14), transparent 34%),
-        radial-gradient(circle at bottom right, rgba(2, 132, 199, .10), transparent 30%),
-        var(--bg);
+    background: radial-gradient(circle at top left, rgba(37, 99, 235, .14), transparent 34%), radial-gradient(circle at bottom right, rgba(2, 132, 199, .10), transparent 30%), var(--bg);
 }
 
 .login-wrapper {
@@ -1213,8 +1215,7 @@ footer {
     margin-top: 2px;
 }
 
-.auth-form-light,
-.content-wrapper.auth {
+.auth-form-light, .content-wrapper.auth {
     background: transparent !important;
 }
 
@@ -1235,25 +1236,19 @@ footer {
 }
 
 /* ============================================================
-   DARK MODE
+    DARK MODE
    ============================================================ */
-
-
 [data-theme="dark"] {
     --bg: #0a1220;
     --surface: #0e1929;
     --surface-2: #111f34;
     --surface-3: #162440;
-
     --border: #1e2f47;
     --border-dark: #2d4060;
-
     --text: #e4eaf2;
     --text-2: #c0cfdf;
     --text-3: #8fa5be;
-
     --primary-light: rgba(37, 99, 235, .15);
-
     --shadow: 0 1px 3px rgba(0, 0, 0, .4);
     --shadow-md: 0 6px 18px rgba(0, 0, 0, .5);
     --shadow-lg: 0 12px 30px rgba(0, 0, 0, .6);
@@ -1264,7 +1259,7 @@ footer {
 }
 
 /* ============================================================
-   RESPONSIVE
+    RESPONSIVE & MOBILE DESIGN
    ============================================================ */
 @media (max-width: 900px) {
     .layout {
@@ -1355,4 +1350,26 @@ footer {
             transform: translateY(0);
         }
     }
+}
+
+.modal-content-myphp-logout {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 95%;
+    max-width: 400px;
+    background: #fff;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0px 2px 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 300ms ease-in-out;
+}
+
+.close, .closeLogout, .closeApagar {
+    color: red;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
 }
