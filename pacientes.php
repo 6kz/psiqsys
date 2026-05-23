@@ -10,7 +10,7 @@ $titulo_pagina = 'Pacientes';
 $funcao_atual = $_SESSION['currentFuncao'] ?? '';
 
 /* =========================================================
-   DESATIVAR PACIENTE
+   DESATIVAR PACIENTE (Soft Delete)
 ========================================================= */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'eliminar') {
     if ($funcao_atual !== 'ti') {
@@ -38,7 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'elimi
         ");
         $stmt2->execute([$id_eliminar]);
 
-        registarLog($pdo, 'PACIENTE', 'DELETE', $id_eliminar, $id_eliminar);
+        // CORREÇÃO: Ação alterada de 'DELETE' para 'DISABLE' (reflete melhor o UPDATE efetuado)
+        registarLog($pdo, 'PACIENTE', 'DISABLE', $id_eliminar, $id_eliminar);
 
         $pdo->commit();
 
@@ -173,6 +174,9 @@ if ($search) {
         OR p.contacto LIKE ?
     ';
     $params = ["%$search%", "%$search%", "%$search%"];
+
+    // CORREÇÃO: Só regista log se houver uma pesquisa real baseada em inputs
+    registarLog($pdo, 'PACIENTE', 'SEARCH: ' . substr($search, 0, 50), null, null);
 } else {
     // Listagem padrão sem pesquisa: apenas os ativos
     $where = 'p.ativo = 1';
@@ -191,7 +195,7 @@ $rows = $pdo->prepare("
 $rows->execute($params);
 $rows = $rows->fetchAll();
 
-registarLog($pdo, 'PACIENTE', 'SELECT', null, null);
+// REMOVIDO: O log genérico de SELECT que executava a cada carregamento de página.
 
 require_once 'includes/header.php';
 ?>
@@ -199,7 +203,7 @@ require_once 'includes/header.php';
 <div class="content-area">
 
     <?php if (isset($_GET['ok'])): ?>
-        <div class="alert alert-success mb-4">
+        <div class="alert alert-success mb-4" id="sucess-alert">
             <i class="ti ti-circle-check"></i>
             <?php
             if ($_GET['ok'] === 'edit') {
@@ -211,6 +215,24 @@ require_once 'includes/header.php';
             }
             ?>
         </div>
+
+        <script>
+            // Aguarda 4 segundos (4000ms) para limpar o '?ok=...' do URL
+            setTimeout(function() {
+                // Remove o parâmetro do URL sem recarregar a página
+                const url = new URL(window.location);
+                url.searchParams.delete('ok');
+                window.history.pushState({}, '', url);
+
+                // Esconde o alerta visualmente com um efeito suave
+                const alert = document.getElementById('sucess-alert');
+                if (alert) {
+                    alert.style.transition = 'opacity 0.5s ease';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                }
+            }, 4000);
+        </script>
     <?php endif; ?>
 
     <?php if (isset($_GET['erro'])): ?>
