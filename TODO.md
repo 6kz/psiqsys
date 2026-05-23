@@ -35,4 +35,3 @@
 - [x] Adição da hora juntamente com a data no topbar
 - [x] Permitir à equipa de TI eliminar pacientes
 - [x] Adicionar botão de logout
-
