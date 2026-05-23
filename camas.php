@@ -83,142 +83,141 @@ function estado_badge(string $e): string
 }
 ?>
 
-<?php if (isset($_GET['ok'])): ?>
-    <div class="alert alert-success mb-4">
-        <i class="ti ti-circle-check"></i>
-        <?php
-        $msgs = ['estado' => 'Estado da cama atualizado.', 'nova' => 'Cama criada com sucesso.', 'quarto' => 'Quarto criado com sucesso.'];
-        echo $msgs[$_GET['ok']] ?? 'Operação realizada com sucesso.';
-        ?>
-    </div>
-<?php endif; ?>
+<div class="content-area">
 
-<!-- Stats -->
-<div class="stats-grid mb-4">
-    <div class="stat-card blue">
-        <div class="stat-icon"><i class="ti ti-building-hospital" style="color:var(--primary)"></i></div>
-        <div class="stat-label">Total Camas</div>
-        <div class="stat-value"><?= $total_camas ?></div>
-    </div>
-    <div class="stat-card green">
-        <div class="stat-icon"><i class="ti ti-check-circle" style="color:var(--success)"></i></div>
-        <div class="stat-label">Disponíveis</div>
-        <div class="stat-value"><?= $stats_estado['disponivel'] ?? 0 ?></div>
-    </div>
-    <div class="stat-card red">
-        <div class="stat-icon"><i class="ti ti-bed" style="color:var(--danger)"></i></div>
-        <div class="stat-label">Ocupadas</div>
-        <div class="stat-value"><?= $stats_estado['ocupada'] ?? 0 ?></div>
-    </div>
-    <div class="stat-card amber">
-        <div class="stat-icon"><i class="ti ti-lock" style="color:var(--warning)"></i></div>
-        <div class="stat-label">Interditas</div>
-        <div class="stat-value"><?= $stats_estado['interdita'] ?? 0 ?></div>
-    </div>
-    <div class="stat-card cyan">
-        <div class="stat-icon"><i class="ti ti-tools" style="color:var(--info)"></i></div>
-        <div class="stat-label">Manutenção</div>
-        <div class="stat-value"><?= $stats_estado['manutencao'] ?? 0 ?></div>
-    </div>
-    <div class="stat-card blue">
-        <div class="stat-icon"><i class="ti ti-percentage" style="color:var(--primary)"></i></div>
-        <div class="stat-label">Taxa Ocupação</div>
-        <div class="stat-value"><?= $taxa_ocupacao ?>%</div>
-        <!-- Barra de progresso -->
-        <div style="height:4px;background:var(--border);border-radius:2px;margin-top:4px">
-            <div style="height:100%;width:<?= $taxa_ocupacao ?>%;background:var(--primary);border-radius:2px;transition:width .4s"></div>
+    <?php if (isset($_GET['ok'])): ?>
+        <div class="alert alert-success mb-4">
+            <i class="ti ti-circle-check"></i>
+            <?php
+            $msgs = ['estado' => 'Estado da cama atualizado.', 'nova' => 'Cama criada com sucesso.', 'quarto' => 'Quarto criado com sucesso.'];
+            echo $msgs[$_GET['ok']] ?? 'Operação realizada com sucesso.';
+            ?>
+        </div>
+    <?php endif; ?>
+
+    <div class="stats-grid mb-4">
+        <div class="stat-card blue">
+            <div class="stat-icon"><i class="ti ti-building-hospital" style="color:var(--primary)"></i></div>
+            <div class="stat-label">Total Camas</div>
+            <div class="stat-value"><?= $total_camas ?></div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="ti ti-check-circle" style="color:var(--success)"></i></div>
+            <div class="stat-label">Disponíveis</div>
+            <div class="stat-value"><?= $stats_estado['disponivel'] ?? 0 ?></div>
+        </div>
+        <div class="stat-card red">
+            <div class="stat-icon"><i class="ti ti-bed" style="color:var(--danger)"></i></div>
+            <div class="stat-label">Ocupadas</div>
+            <div class="stat-value"><?= $stats_estado['ocupada'] ?? 0 ?></div>
+        </div>
+        <div class="stat-card amber">
+            <div class="stat-icon"><i class="ti ti-lock" style="color:var(--warning)"></i></div>
+            <div class="stat-label">Interditas</div>
+            <div class="stat-value"><?= $stats_estado['interdita'] ?? 0 ?></div>
+        </div>
+        <div class="stat-card cyan">
+            <div class="stat-icon"><i class="ti ti-tools" style="color:var(--info)"></i></div>
+            <div class="stat-label">Manutenção</div>
+            <div class="stat-value"><?= $stats_estado['manutencao'] ?? 0 ?></div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-icon"><i class="ti ti-percentage" style="color:var(--primary)"></i></div>
+            <div class="stat-label">Taxa Ocupação</div>
+            <div class="stat-value"><?= $taxa_ocupacao ?>%</div>
+            <div style="height:4px;background:var(--border);border-radius:2px;margin-top:4px">
+                <div style="height:100%;width:<?= $taxa_ocupacao ?>%;background:var(--primary);border-radius:2px;transition:width .4s"></div>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Filtros + Ações -->
-<div class="flex items-center justify-between mb-4">
-    <div class="flex gap-2">
-        <a href="camas.php" class="btn <?= !$filtro_estado ? 'btn-primary' : 'btn-outline' ?> btn-sm">Todas</a>
-        <?php foreach (['disponivel', 'ocupada', 'interdita', 'manutencao'] as $est): ?>
-            <a href="?estado=<?= $est ?>" class="btn <?= $filtro_estado === $est ? 'btn-primary' : 'btn-outline' ?> btn-sm">
-                <?= ucfirst($est) ?>
-            </a>
-        <?php endforeach; ?>
-    </div>
-    <div class="flex gap-2">
-        <button class="btn btn-outline btn-sm" onclick="openModal('modal-quarto')">
-            <i class="ti ti-plus"></i> Novo Quarto
-        </button>
-        <button class="btn btn-primary btn-sm" onclick="openModal('modal-nova-cama')">
-            <i class="ti ti-plus"></i> Nova Cama
-        </button>
-    </div>
-</div>
-
-<!-- Mapa visual de camas por quarto -->
-<?php
-$por_quarto = [];
-foreach ($camas as $c) {
-    $key = $c['servico'] . ' — Q' . $c['numero_quarto'];
-    $por_quarto[$key][] = $c;
-}
-?>
-
-<?php foreach ($por_quarto as $quarto_label => $lista): ?>
-    <div class="card mb-4">
-        <div class="card-header">
-            <span class="card-title"><i class="ti ti-door"></i> <?= htmlspecialchars($quarto_label) ?></span>
-            <span class="text-sm text-muted"><?= count($lista) ?> cama(s)</span>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;padding:20px">
-            <?php foreach ($lista as $c): ?>
-                <?php
-                $cor = ['disponivel' => '#dcfce7', 'ocupada' => '#fee2e2', 'interdita' => '#fef3c7', 'manutencao' => '#f3f4f6'];
-                $borda = ['disponivel' => 'var(--success)', 'ocupada' => 'var(--danger)', 'interdita' => 'var(--warning)', 'manutencao' => 'var(--border-dark)'];
-                ?>
-                <div style="background:<?= $cor[$c['estado']] ?? '#f9fafb' ?>;border:2px solid <?= $borda[$c['estado']] ?? 'var(--border)' ?>;border-radius:var(--radius);padding:16px">
-                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-                        <div>
-                            <div style="font-size:1.3rem;font-weight:700;font-family:var(--mono)">C<?= htmlspecialchars($c['numero_cama']) ?></div>
-                            <div class="text-sm text-muted">Cama #<?= $c['id_cama'] ?></div>
-                        </div>
-                        <?= estado_badge($c['estado']) ?>
-                    </div>
-                    <?php if ($c['paciente_atual']): ?>
-                        <div style="font-size:.82rem;margin-bottom:10px">
-                            <i class="ti ti-user" style="font-size:13px"></i>
-                            <?= htmlspecialchars($c['paciente_atual']) ?>
-                        </div>
-                    <?php else: ?>
-                        <div style="font-size:.78rem;color:var(--text-3);margin-bottom:10px">Sem paciente</div>
-                    <?php endif; ?>
-                    <?php if ($c['estado'] !== 'ocupada'): ?>
-                        <form method="post" style="display:flex;gap:6px;align-items:center">
-                            <input type="hidden" name="action" value="estado">
-                            <input type="hidden" name="id_cama" value="<?= $c['id_cama'] ?>">
-                            <select name="estado" class="form-control" style="font-size:.78rem;padding:4px 8px">
-                                <?php foreach (['disponivel', 'interdita', 'manutencao'] as $opt): ?>
-                                    <option value="<?= $opt ?>" <?= $c['estado'] === $opt ? 'selected' : '' ?>><?= ucfirst($opt) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <button class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:.75rem">OK</button>
-                        </form>
-                    <?php else: ?>
-                        <div class="text-sm text-muted" style="font-size:.78rem">Estado gerido pelo internamento</div>
-                    <?php endif; ?>
-                </div>
+    <div class="flex items-center justify-between mb-4">
+        <div class="flex gap-2">
+            <a href="camas.php" class="btn <?= !$filtro_estado ? 'btn-primary' : 'btn-outline' ?> btn-sm">Todas</a>
+            <?php foreach (['disponivel', 'ocupada', 'interdita', 'manutencao'] as $est): ?>
+                <a href="?estado=<?= $est ?>" class="btn <?= $filtro_estado === $est ? 'btn-primary' : 'btn-outline' ?> btn-sm">
+                    <?= ucfirst($est) ?>
+                </a>
             <?php endforeach; ?>
         </div>
-    </div>
-<?php endforeach; ?>
-
-<?php if (empty($camas)): ?>
-    <div class="card">
-        <div style="text-align:center;padding:48px;color:var(--text-3)">
-            <i class="ti ti-bed" style="font-size:40px;display:block;margin-bottom:12px"></i>
-            Nenhuma cama encontrada
+        <div class="flex gap-2">
+            <button class="btn btn-outline btn-sm" onclick="openModal('modal-quarto')">
+                <i class="ti ti-plus"></i> Novo Quarto
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-nova-cama')">
+                <i class="ti ti-plus"></i> Nova Cama
+            </button>
         </div>
     </div>
-<?php endif; ?>
 
-<!-- Modal Nova Cama -->
-<div class="modal-overlay" id="modal-nova-cama">
+    <?php
+    $por_quarto = [];
+    foreach ($camas as $c) {
+        $key = $c['servico'] . ' — Q' . $c['numero_quarto'];
+        $por_quarto[$key][] = $c;
+    }
+    ?>
+
+    <?php foreach ($por_quarto as $quarto_label => $lista): ?>
+        <div class="card mb-4">
+            <div class="card-header">
+                <span class="card-title"><i class="ti ti-door"></i> <?= htmlspecialchars($quarto_label) ?></span>
+                <span class="text-sm text-muted"><?= count($lista) ?> cama(s)</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;padding:20px">
+                <?php foreach ($lista as $c): ?>
+                    <?php
+                    $cor = ['disponivel' => '#dcfce7', 'ocupada' => '#fee2e2', 'interdita' => '#fef3c7', 'manutencao' => '#f3f4f6'];
+                    $borda = ['disponivel' => 'var(--success)', 'ocupada' => 'var(--danger)', 'interdita' => 'var(--warning)', 'manutencao' => 'var(--border-dark)'];
+                    ?>
+                    <div style="background:<?= $cor[$c['estado']] ?? '#f9fafb' ?>;border:2px solid <?= $borda[$c['estado']] ?? 'var(--border)' ?>;border-radius:var(--radius);padding:16px">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+                            <div>
+                                <div style="font-size:1.3rem;font-weight:700;font-family:var(--mono)">C<?= htmlspecialchars($c['numero_cama']) ?></div>
+                                <div class="text-sm text-muted">Cama #<?= $c['id_cama'] ?></div>
+                            </div>
+                            <?= estado_badge($c['estado']) ?>
+                        </div>
+                        <?php if ($c['paciente_atual']): ?>
+                            <div style="font-size:.82rem;margin-bottom:10px">
+                                <i class="ti ti-user" style="font-size:13px"></i>
+                                <?= htmlspecialchars($c['paciente_atual']) ?>
+                            </div>
+                        <?php else: ?>
+                            <div style="font-size:.78rem;color:var(--text-3);margin-bottom:10px">Sem paciente</div>
+                        <?php endif; ?>
+
+                        <?php if ($c['estado'] !== 'ocupada'): ?>
+                            <form method="post" style="display:flex;gap:6px;align-items:center">
+                                <input type="hidden" name="action" value="estado">
+                                <input type="hidden" name="id_cama" value="<?= $c['id_cama'] ?>">
+                                <select name="estado" class="form-control" style="font-size:.78rem;padding:4px 8px">
+                                    <?php foreach (['disponivel', 'interdita', 'manutencao'] as $opt): ?>
+                                        <option value="<?= $opt ?>" <?= $c['estado'] === $opt ? 'selected' : '' ?>><?= ucfirst($opt) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:.75rem">OK</button>
+                            </form>
+                        <?php else: ?>
+                            <div class="text-sm text-muted" style="font-size:.78rem">Estado gerido pelo internamento</div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endforeach; ?>
+
+    <?php if (empty($camas)): ?>
+        <div class="card">
+            <div style="text-align:center;padding:48px;color:var(--text-3)">
+                <i class="ti ti-bed" style="font-size:40px;display:block;margin-bottom:12px"></i>
+                Nenhuma cama encontrada
+            </div>
+        </div>
+    <?php endif; ?>
+
+</div>
+<div class="modal-overlay" id="modal-nova-cama" style="display: none;">
     <div class="modal">
         <div class="modal-header">
             <span class="modal-title"><i class="ti ti-bed" style="color:var(--primary);margin-right:8px"></i>Nova Cama</span>
@@ -259,8 +258,8 @@ foreach ($camas as $c) {
     </div>
 </div>
 
-<!-- Modal Novo Quarto -->
-<div class="modal-overlay" id="modal-quarto">
+
+<div class="modal-overlay" id="modal-quarto" style="display: none;">
     <div class="modal">
         <div class="modal-header">
             <span class="modal-title"><i class="ti ti-door" style="color:var(--primary);margin-right:8px"></i>Novo Quarto</span>
@@ -293,17 +292,36 @@ foreach ($camas as $c) {
     </div>
 </div>
 
+
 <script>
     function openModal(id) {
-        document.getElementById(id).classList.add('open');
+        var overlay = document.getElementById(id);
+        if (!overlay) return;
+
+        overlay.style.display = "flex"; // Ativa o display antes de animar
+        setTimeout(function() {
+            overlay.classList.add('open');
+        }, 10);
     }
 
     function closeModal(id) {
-        document.getElementById(id).classList.remove('open');
+        var overlay = document.getElementById(id);
+        if (!overlay) return;
+
+        overlay.classList.remove('open');
+        setTimeout(function() {
+            if (!overlay.classList.contains('open')) {
+                overlay.style.display = "none"; // Remove do fluxo após esmaecer (200ms)
+            }
+        }, 200);
     }
+
+    // Fechar ao clicar fora da caixa do modal
     document.querySelectorAll('.modal-overlay').forEach(m => {
         m.addEventListener('click', e => {
-            if (e.target === m) m.classList.remove('open');
+            if (e.target === m) {
+                closeModal(m.id);
+            }
         });
     });
 </script>
