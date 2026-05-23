@@ -2,9 +2,9 @@
 
 O **PSIQSYS** é uma plataforma de gestão clínica especializada para unidades de internamento psiquiátrico. O sistema foca-se na monitorização em tempo real de riscos (suicidário e agressividade), observações comportamentais e gestão de camas.
 
-## 🚀 Versão Atual: v2.2 (Refined Design)
+## 🚀 Versão Atual: v4.1 (Refined Design)
 
-A versão 2.2 introduz um Design System aprimorado com foco em legibilidade, acessibilidade e micro-interações para reduzir a carga cognitiva dos profissionais de saúde.
+A versão 4.1 introduz um Design System aprimorado com foco em legibilidade, acessibilidade e micro-interações para reduzir a carga cognitiva dos profissionais de saúde.
 
 ### Principais Funcionalidades
 * **Dashboard em Tempo Real:** Resumo de estatísticas críticas (internamentos, pacientes, camas, prescrições).
