@@ -97,182 +97,193 @@ require_once 'includes/header.php';
 function estado_badge(string $e): string
 {
     $map = ['ativa' => 'green', 'suspensa' => 'amber', 'concluida' => 'gray', 'cancelada' => 'red'];
-    return '<span class="badge badge-' . ($map[$e] ?? 'gray') . '">' . $e . '</span>';
+    return '<span class="badge badge-' . ($map[$e] ?? 'gray') . '">' . ucfirst($e) . '</span>';
 }
 ?>
 
-<?php if (isset($_GET['ok'])): ?>
-    <div class="alert alert-success mb-4">
-        <i class="ti ti-circle-check"></i>
+<div class="content-area">
+
+    <?php if (isset($_GET['ok'])): ?>
+        <div class="alert alert-success mb-4">
+            <i class="ti ti-circle-check"></i>
+            <?php
+            $msgs = ['nova' => 'Prescrição criada com sucesso.', 'estado' => 'Estado da prescrição atualizado.'];
+            echo $msgs[$_GET['ok']] ?? 'Operação realizada com sucesso.';
+            ?>
+        </div>
+    <?php endif; ?>
+
+    <div class="stats-grid mb-4">
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="ti ti-pill" style="color:var(--success)"></i></div>
+            <div class="stat-label">Ativas</div>
+            <div class="stat-value"><?= (int)($stats['ativa'] ?? 0) ?></div>
+        </div>
+        <div class="stat-card amber">
+            <div class="stat-icon"><i class="ti ti-player-pause" style="color:var(--warning)"></i></div>
+            <div class="stat-label">Suspensas</div>
+            <div class="stat-value"><?= (int)($stats['suspensa'] ?? 0) ?></div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-icon"><i class="ti ti-circle-check" style="color:var(--primary)"></i></div>
+            <div class="stat-label">Concluídas</div>
+            <div class="stat-value"><?= (int)($stats['concluida'] ?? 0) ?></div>
+        </div>
+        <div class="stat-card red">
+            <div class="stat-icon"><i class="ti ti-ban" style="color:var(--danger)"></i></div>
+            <div class="stat-label">Canceladas</div>
+            <div class="stat-value"><?= (int)($stats['cancelada'] ?? 0) ?></div>
+        </div>
+    </div>
+
+    <?php if ($filtro_int): ?>
         <?php
-        $msgs = ['nova' => 'Prescrição criada com sucesso.', 'estado' => 'Estado da prescrição atualizado.'];
-        echo $msgs[$_GET['ok']] ?? 'Operação realizada.';
+        $ii = $pdo->prepare("SELECT p.nome FROM INTERNAMENTO i JOIN PACIENTE p ON p.id_paciente=i.id_paciente WHERE i.id_internamento=?");
+        $ii->execute([$filtro_int]);
+        $ii = $ii->fetch();
         ?>
-    </div>
-<?php endif; ?>
+        <div class="alert alert-warning mb-4">
+            <i class="ti ti-filter"></i>
+            A filtrar por internamento #<?= $filtro_int ?> — <strong><?= htmlspecialchars($ii['nome'] ?? '') ?></strong>
+            &nbsp;<a href="prescricoes.php" class="btn btn-outline btn-sm" style="margin-left: auto;">Ver todas</a>
+        </div>
+    <?php endif; ?>
 
-<!-- Stats -->
-<div class="stats-grid mb-4">
-    <div class="stat-card green">
-        <div class="stat-icon"><i class="ti ti-pill" style="color:var(--success)"></i></div>
-        <div class="stat-label">Ativas</div>
-        <div class="stat-value"><?= $stats['ativa'] ?? 0 ?></div>
-    </div>
-    <div class="stat-card amber">
-        <div class="stat-icon"><i class="ti ti-pause" style="color:var(--warning)"></i></div>
-        <div class="stat-label">Suspensas</div>
-        <div class="stat-value"><?= $stats['suspensa'] ?? 0 ?></div>
-    </div>
-    <div class="stat-card blue">
-        <div class="stat-icon"><i class="ti ti-circle-check" style="color:var(--primary)"></i></div>
-        <div class="stat-label">Concluídas</div>
-        <div class="stat-value"><?= $stats['concluida'] ?? 0 ?></div>
-    </div>
-    <div class="stat-card red">
-        <div class="stat-icon"><i class="ti ti-ban" style="color:var(--danger)"></i></div>
-        <div class="stat-label">Canceladas</div>
-        <div class="stat-value"><?= $stats['cancelada'] ?? 0 ?></div>
-    </div>
-</div>
+    <div class="flex items-center justify-between mb-4">
+        <div class="flex gap-2">
+            <a href="prescricoes.php<?= $filtro_int ? "?internamento=$filtro_int" : '' ?>" class="btn <?= !$filtro_est ? 'btn-primary' : 'btn-outline' ?> btn-sm">Todas</a>
+            <?php foreach (['ativa', 'suspensa', 'concluida', 'cancelada'] as $est): ?>
+                <a href="?<?= $filtro_int ? "internamento=$filtro_int&" : '' ?>estado=<?= $est ?>"
+                    class="btn <?= $filtro_est === $est ? 'btn-primary' : 'btn-outline' ?> btn-sm">
+                    <?= ucfirst($est) ?>
+                </a>
+            <?php endforeach; ?>
+        </div>
 
-<?php if ($filtro_int): ?>
-    <?php
-    $ii = $pdo->prepare("SELECT p.nome FROM INTERNAMENTO i JOIN PACIENTE p ON p.id_paciente=i.id_paciente WHERE i.id_internamento=?");
-    $ii->execute([$filtro_int]);
-    $ii = $ii->fetch();
-    ?>
-    <div class="alert alert-warning mb-4">
-        <i class="ti ti-filter"></i>
-        A filtrar por internamento #<?= $filtro_int ?> — <strong><?= htmlspecialchars($ii['nome'] ?? '') ?></strong>
-        &nbsp;<a href="prescricoes.php" class="btn btn-outline btn-sm">Ver todas</a>
-    </div>
-<?php endif; ?>
-
-<!-- Filtros + Ações -->
-<div class="flex items-center justify-between mb-4">
-    <div class="flex gap-2">
-        <a href="prescricoes.php<?= $filtro_int ? "?internamento=$filtro_int" : '' ?>" class="btn <?= !$filtro_est ? 'btn-primary' : 'btn-outline' ?> btn-sm">Todas</a>
-        <?php foreach (['ativa', 'suspensa', 'concluida', 'cancelada'] as $est): ?>
-            <a href="?<?= $filtro_int ? "internamento=$filtro_int&" : '' ?>estado=<?= $est ?>"
-                class="btn <?= $filtro_est === $est ? 'btn-primary' : 'btn-outline' ?> btn-sm">
-                <?= ucfirst($est) ?>
-            </a>
-        <?php endforeach; ?>
-    </div>
-    <div class="flex gap-3 items-center">
-        <form method="get" style="display:flex;gap:8px;align-items:center">
-            <?php if ($filtro_int): ?><input type="hidden" name="internamento" value="<?= $filtro_int ?>"><?php endif; ?>
-            <?php if ($filtro_est): ?><input type="hidden" name="estado" value="<?= $filtro_est ?>"><?php endif; ?>
-            <div class="search-bar">
-                <i class="ti ti-search"></i>
-                <input type="text" name="q" placeholder="Paciente ou medicamento…" value="<?= htmlspecialchars($search) ?>">
-            </div>
-        </form>
-        <button class="btn btn-primary btn-sm" onclick="openModal('modal-nova')">
-            <i class="ti ti-plus"></i> Nova Prescrição
-        </button>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-header">
-        <span class="card-title"><i class="ti ti-pill"></i> Prescrições</span>
-        <span class="text-sm text-muted"><?= count($rows) ?> registos</span>
-    </div>
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Paciente</th>
-                    <th>Medicamento</th>
-                    <th>Classe</th>
-                    <th>Dose</th>
-                    <th>Via</th>
-                    <th>Frequência</th>
-                    <th>PRN</th>
-                    <th>Estado</th>
-                    <th>Início</th>
-                    <th>Médico</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($rows as $r): ?>
-                    <tr>
-                        <td class="mono text-muted"><?= $r['id_prescricao'] ?></td>
-                        <td>
-                            <div class="fw-600"><?= htmlspecialchars($r['paciente']) ?></div>
-                            <div class="text-sm text-muted">Int. #<?= $r['id_internamento'] ?></div>
-                        </td>
-                        <td class="fw-600"><?= htmlspecialchars($r['medicamento']) ?></td>
-                        <td class="text-sm text-muted"><?= htmlspecialchars($r['classe']) ?></td>
-                        <td class="mono text-sm"><?= htmlspecialchars($r['dose']) ?></td>
-                        <td><span class="badge badge-gray"><?= $r['via'] ?></span></td>
-                        <td class="text-sm"><?= htmlspecialchars($r['frequencia']) ?></td>
-                        <td>
-                            <?php if ($r['prn']): ?>
-                                <span class="badge badge-amber">SOS</span>
-                                <?php if ($r['dose_maxima_dia']): ?>
-                                    <div class="text-sm text-muted" style="font-size:.72rem">máx <?= $r['dose_maxima_dia'] ?></div>
-                                <?php endif; ?>
-                            <?php else: ?>
-                                <span class="text-muted text-sm">—</span>
-                            <?php endif; ?>
-                        </td>
-                        <td><?= estado_badge($r['estado']) ?></td>
-                        <td class="mono text-sm"><?= date('d/m/Y', strtotime($r['data_inicio'])) ?></td>
-                        <td class="text-sm"><?= htmlspecialchars($r['medico']) ?></td>
-                        <td>
-                            <?php if ($r['estado'] === 'ativa'): ?>
-                                <div class="flex gap-2">
-                                    <form method="post">
-                                        <input type="hidden" name="action" value="estado">
-                                        <input type="hidden" name="id" value="<?= $r['id_prescricao'] ?>">
-                                        <input type="hidden" name="estado" value="suspensa">
-                                        <button class="btn btn-outline btn-sm" title="Suspender">
-                                            <i class="ti ti-player-pause"></i>
-                                        </button>
-                                    </form>
-                                    <form method="post" onsubmit="return confirm('Cancelar esta prescrição?')">
-                                        <input type="hidden" name="action" value="estado">
-                                        <input type="hidden" name="id" value="<?= $r['id_prescricao'] ?>">
-                                        <input type="hidden" name="estado" value="cancelada">
-                                        <button class="btn btn-outline btn-sm" title="Cancelar" style="color:var(--danger)">
-                                            <i class="ti ti-ban"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            <?php elseif ($r['estado'] === 'suspensa'): ?>
-                                <form method="post">
-                                    <input type="hidden" name="action" value="estado">
-                                    <input type="hidden" name="id" value="<?= $r['id_prescricao'] ?>">
-                                    <input type="hidden" name="estado" value="ativa">
-                                    <button class="btn btn-outline btn-sm" title="Reativar">
-                                        <i class="ti ti-player-play"></i> Reativar
-                                    </button>
-                                </form>
-                            <?php else: ?>
-                                <span class="text-muted text-sm">—</span>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-                <?php if (empty($rows)): ?>
-                    <tr>
-                        <td colspan="12" class="text-muted text-sm" style="text-align:center;padding:32px">Nenhuma prescrição encontrada</td>
-                    </tr>
+        <div class="flex gap-3 items-center">
+            <form method="get" style="display:flex;gap:8px;align-items:center">
+                <?php if ($filtro_int): ?><input type="hidden" name="internamento" value="<?= $filtro_int ?>"><?php endif; ?>
+                <?php if ($filtro_est): ?><input type="hidden" name="estado" value="<?= $filtro_est ?>"><?php endif; ?>
+                <div class="search-bar">
+                    <i class="ti ti-search"></i>
+                    <input type="text" name="q" placeholder="Paciente ou medicamento…" value="<?= htmlspecialchars($search) ?>">
+                </div>
+                <?php if ($search): ?>
+                    <a href="prescricoes.php<?= ($filtro_int || $filtro_est) ? '?' . http_build_query(array_filter(['internamento' => $filtro_int, 'estado' => $filtro_est])) : '' ?>" class="btn btn-outline btn-icon" style="height:38px;width:38px;display:flex;align-items:center;justify-content:center">
+                        <i class="ti ti-x"></i>
+                    </a>
                 <?php endif; ?>
-            </tbody>
-        </table>
+            </form>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-nova')">
+                <i class="ti ti-plus"></i> Nova Prescrição
+            </button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title"><i class="ti ti-pill"></i> Prescrições</span>
+            <span class="text-sm text-muted"><?= count($rows) ?> registos</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Paciente</th>
+                        <th>Medicamento</th>
+                        <th>Classe</th>
+                        <th>Dose</th>
+                        <th>Via</th>
+                        <th>Frequência</th>
+                        <th>PRN</th>
+                        <th>Estado</th>
+                        <th>Início</th>
+                        <th>Médico</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($rows as $r): ?>
+                        <tr style="<?= in_array($r['estado'], ['concluida', 'cancelada']) ? 'opacity: 0.65; background-color: var(--card-bg-dim, #fafafa);' : '' ?>">
+                            <td class="mono text-muted"><?= (int)$r['id_prescricao'] ?></td>
+                            <td>
+                                <div class="fw-600"><?= htmlspecialchars($r['paciente']) ?></div>
+                                <div class="text-sm text-muted">Int. #<?= (int)$r['id_internamento'] ?></div>
+                            </td>
+                            <td class="fw-600"><?= htmlspecialchars($r['medicamento']) ?></td>
+                            <td class="text-sm text-muted"><?= htmlspecialchars($r['classe']) ?></td>
+                            <td class="mono text-sm"><?= htmlspecialchars($r['dose']) ?></td>
+                            <td><span class="badge badge-gray"><?= htmlspecialchars(strtoupper($r['via'])) ?></span></td>
+                            <td class="text-sm"><?= htmlspecialchars($r['frequencia']) ?></td>
+                            <td>
+                                <?php if ($r['prn']): ?>
+                                    <span class="badge badge-amber">SOS</span>
+                                    <?php if ($r['dose_maxima_dia']): ?>
+                                        <div class="text-sm text-muted" style="font-size:.72rem; margin-top:2px;">máx <?= htmlspecialchars($r['dose_maxima_dia']) ?></div>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <span class="text-muted text-sm">—</span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?= estado_badge($r['estado']) ?></td>
+                            <td class="mono text-sm"><?= date('d/m/Y', strtotime($r['data_inicio'])) ?></td>
+                            <td class="text-sm"><?= htmlspecialchars($r['medico']) ?></td>
+                            <td>
+                                <div class="flex gap-2">
+                                    <?php if ($r['estado'] === 'ativa'): ?>
+                                        <form method="post" style="display:inline">
+                                            <input type="hidden" name="action" value="estado">
+                                            <input type="hidden" name="id" value="<?= (int)$r['id_prescricao'] ?>">
+                                            <input type="hidden" name="estado" value="suspensa">
+                                            <button type="submit" class="btn btn-outline btn-icon btn-sm" title="Suspender">
+                                                <i class="ti ti-player-pause"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" style="display:inline" onsubmit="return confirm('Tem a certeza que deseja cancelar esta prescrição?')">
+                                            <input type="hidden" name="action" value="estado">
+                                            <input type="hidden" name="id" value="<?= (int)$r['id_prescricao'] ?>">
+                                            <input type="hidden" name="estado" value="cancelada">
+                                            <button type="submit" class="btn btn-outline btn-icon btn-sm" title="Cancelar" style="color:var(--danger)">
+                                                <i class="ti ti-ban"></i>
+                                            </button>
+                                        </form>
+                                    <?php elseif ($r['estado'] === 'suspensa'): ?>
+                                        <form method="post" style="display:inline">
+                                            <input type="hidden" name="action" value="estado">
+                                            <input type="hidden" name="id" value="<?= (int)$r['id_prescricao'] ?>">
+                                            <input type="hidden" name="estado" value="ativa">
+                                            <button type="submit" class="btn btn-outline btn-sm" title="Reativar">
+                                                <i class="ti ti-player-play"></i> Reativar
+                                            </button>
+                                        </form>
+                                    <?php else: ?>
+                                        <span class="text-muted text-sm">—</span>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php if (empty($rows)): ?>
+                        <tr>
+                            <td colspan="12" class="text-muted text-sm" style="text-align:center;padding:32px">
+                                <i class="ti ti-mood-empty" style="font-size:32px;display:block;margin-bottom:8px;color:var(--text-muted)"></i>
+                                Nenhuma prescrição encontrada
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<!-- Modal Nova Prescrição -->
-<div class="modal-overlay" id="modal-nova">
+<div class="modal-overlay" id="modal-nova" style="display: none;">
     <div class="modal" style="max-width:700px">
         <div class="modal-header">
-            <span class="modal-title"><i class="ti ti-pill" style="color:var(--primary);margin-right:8px"></i>Nova Prescrição</span>
+            <span class="modal-title">
+                <i class="ti ti-pill" style="color:var(--primary);margin-right:8px"></i>Nova Prescrição
+            </span>
             <button class="btn btn-outline btn-icon" onclick="closeModal('modal-nova')"><i class="ti ti-x"></i></button>
         </div>
         <form method="post">
@@ -284,8 +295,8 @@ function estado_badge(string $e): string
                         <select name="id_internamento" class="form-control" required>
                             <option value="">— Selecionar —</option>
                             <?php foreach ($internamentos_ativos as $ia): ?>
-                                <option value="<?= $ia['id_internamento'] ?>" <?= $filtro_int == $ia['id_internamento'] ? 'selected' : '' ?>>
-                                    #<?= $ia['id_internamento'] ?> — <?= htmlspecialchars($ia['paciente']) ?> (<?= $ia['num_utente'] ?>)
+                                <option value="<?= (int)$ia['id_internamento'] ?>" <?= $filtro_int == $ia['id_internamento'] ? 'selected' : '' ?>>
+                                    #<?= (int)$ia['id_internamento'] ?> — <?= htmlspecialchars($ia['paciente']) ?> (<?= htmlspecialchars($ia['num_utente']) ?>)
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -295,7 +306,7 @@ function estado_badge(string $e): string
                         <select name="id_profissional" class="form-control" required>
                             <option value="">— Selecionar —</option>
                             <?php foreach ($profissionais as $pf): ?>
-                                <option value="<?= $pf['id_profissional'] ?>"><?= htmlspecialchars($pf['nome']) ?></option>
+                                <option value="<?= (int)$pf['id_profissional'] ?>"><?= htmlspecialchars($pf['nome']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -304,7 +315,7 @@ function estado_badge(string $e): string
                         <select name="id_medicacao" class="form-control" required>
                             <option value="">— Selecionar —</option>
                             <?php foreach ($medicacoes as $med): ?>
-                                <option value="<?= $med['id_medicacao'] ?>"><?= htmlspecialchars($med['nome']) ?> — <?= $med['dosagem'] ?> (<?= $med['classe'] ?>)</option>
+                                <option value="<?= (int)$med['id_medicacao'] ?>"><?= htmlspecialchars($med['nome']) ?> — <?= htmlspecialchars($med['dosagem']) ?> (<?= htmlspecialchars($med['classe']) ?>)</option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -337,8 +348,7 @@ function estado_badge(string $e): string
                         <input type="date" name="data_fim" class="form-control">
                     </div>
 
-                    <!-- PRN toggle -->
-                    <div class="form-group" style="grid-column:1/-1">
+                    <div class="form-group" style="grid-column:1/-1; margin-top: 8px;">
                         <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
                             <input type="checkbox" name="prn" id="prn_check" value="1" onchange="togglePrn(this)">
                             <span class="form-label" style="margin:0">Prescrição SOS (PRN — se necessário)</span>
@@ -360,20 +370,43 @@ function estado_badge(string $e): string
 
 <script>
     function openModal(id) {
-        document.getElementById(id).classList.add('open');
+        var overlay = document.getElementById(id);
+        if (!overlay) return;
+
+        overlay.style.display = "flex";
+        setTimeout(function() {
+            overlay.classList.add('open');
+        }, 10);
     }
 
     function closeModal(id) {
-        document.getElementById(id).classList.remove('open');
+        var overlay = document.getElementById(id);
+        if (!overlay) return;
+
+        overlay.classList.remove('open');
+        setTimeout(function() {
+            if (!overlay.classList.contains('open')) {
+                overlay.style.display = "none";
+            }
+        }, 200);
     }
 
     function togglePrn(cb) {
-        document.getElementById('dose_max_group').style.display = cb.checked ? 'block' : 'none';
+        var group = document.getElementById('dose_max_group');
+        if (!group) return;
+
+        group.style.display = cb.checked ? 'block' : 'none';
+        var input = group.querySelector('input');
+        if (input) {
+            input.required = cb.checked;
+        }
     }
 
     document.querySelectorAll('.modal-overlay').forEach(m => {
         m.addEventListener('click', e => {
-            if (e.target === m) m.classList.remove('open');
+            if (e.target === m) {
+                closeModal(m.id);
+            }
         });
     });
 </script>
