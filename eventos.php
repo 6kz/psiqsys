@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'novo'
     $stmt = $pdo->prepare("
         INSERT INTO EVENTO_CRITICO
           (id_internamento, id_profissional, data_hora, tipo_evento,
-           descricao, intervencao_realizada, gravidade)
+            descricao, intervencao_realizada, gravidade)
         VALUES (?,?,?,?,?,?,?)
     ");
     $stmt->execute([
@@ -102,171 +102,169 @@ $tipos_label = [
 ];
 ?>
 
-<?php if (isset($_GET['ok'])): ?>
-    <div class="alert alert-success mb-4">
-        <i class="ti ti-circle-check"></i> Evento crítico registado com sucesso.
-    </div>
-<?php endif; ?>
+<div class="content-area">
 
-<!-- Stats -->
-<div class="stats-grid mb-4">
-    <div class="stat-card red">
-        <div class="stat-icon"><i class="ti ti-alert-triangle" style="color:var(--danger)"></i></div>
-        <div class="stat-label">Hoje</div>
-        <div class="stat-value"><?= $stats_hoje ?></div>
-    </div>
-    <div class="stat-card green">
-        <div class="stat-icon"><i class="ti ti-circle-check" style="color:var(--success)"></i></div>
-        <div class="stat-label">Gravidade Baixa</div>
-        <div class="stat-value"><?= $stats_grav['baixa'] ?? 0 ?></div>
-    </div>
-    <div class="stat-card amber">
-        <div class="stat-icon"><i class="ti ti-alert-circle" style="color:var(--warning)"></i></div>
-        <div class="stat-label">Gravidade Moderada</div>
-        <div class="stat-value"><?= $stats_grav['moderada'] ?? 0 ?></div>
-    </div>
-    <div class="stat-card red">
-        <div class="stat-icon"><i class="ti ti-flame" style="color:var(--danger)"></i></div>
-        <div class="stat-label">Gravidade Elevada</div>
-        <div class="stat-value"><?= ($stats_grav['elevada'] ?? 0) + ($stats_grav['critica'] ?? 0) ?></div>
-    </div>
-</div>
-
-<?php if ($filtro_int): ?>
-    <?php
-    $ii = $pdo->prepare("SELECT p.nome FROM INTERNAMENTO i JOIN PACIENTE p ON p.id_paciente=i.id_paciente WHERE i.id_internamento=?");
-    $ii->execute([$filtro_int]);
-    $ii = $ii->fetch();
-    ?>
-    <div class="alert alert-warning mb-4">
-        <i class="ti ti-filter"></i>
-        A filtrar por internamento #<?= $filtro_int ?> — <strong><?= htmlspecialchars($ii['nome'] ?? '') ?></strong>
-        &nbsp;<a href="eventos.php" class="btn btn-outline btn-sm">Ver todos</a>
-    </div>
-<?php endif; ?>
-
-<!-- Filtros + Ações -->
-<div class="flex items-center justify-between mb-4">
-    <div class="flex gap-2" style="flex-wrap:wrap">
-        <a href="eventos.php<?= $filtro_int ? "?internamento=$filtro_int" : '' ?>" class="btn <?= !$filtro_grav ? 'btn-primary' : 'btn-outline' ?> btn-sm">Todos</a>
-        <?php foreach (['baixa', 'moderada', 'elevada', 'critica'] as $g): ?>
-            <a href="?<?= $filtro_int ? "internamento=$filtro_int&" : '' ?>gravidade=<?= $g ?>"
-                class="btn <?= $filtro_grav === $g ? 'btn-primary' : 'btn-outline' ?> btn-sm">
-                <?= ucfirst($g) ?>
-            </a>
-        <?php endforeach; ?>
-    </div>
-    <div class="flex gap-3 items-center">
-        <form method="get" style="display:flex;gap:8px;align-items:center">
-            <?php if ($filtro_int): ?><input type="hidden" name="internamento" value="<?= $filtro_int ?>"><?php endif; ?>
-            <div class="search-bar">
-                <i class="ti ti-search"></i>
-                <input type="text" name="q" placeholder="Pesquisar paciente…" value="<?= htmlspecialchars($search) ?>">
-            </div>
-        </form>
-        <button class="btn btn-primary btn-sm" onclick="openModal('modal-novo')">
-            <i class="ti ti-plus"></i> Registar Evento
-        </button>
-    </div>
-</div>
-
-<div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start">
-
-    <!-- Tabela principal -->
-    <div class="card">
-        <div class="card-header">
-            <span class="card-title" style="color:var(--danger)"><i class="ti ti-alert-triangle"></i> Eventos Críticos</span>
-            <span class="text-sm text-muted"><?= count($rows) ?> registos</span>
+    <?php if (isset($_GET['ok'])): ?>
+        <div class="alert alert-success mb-4">
+            <i class="ti ti-circle-check"></i> Evento crítico registado com sucesso.
         </div>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data/Hora</th>
-                        <th>Paciente</th>
-                        <th>Tipo</th>
-                        <th>Gravidade</th>
-                        <th>Profissional</th>
-                        <th>Descrição</th>
-                        <th>Intervenção</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($rows as $r): ?>
-                        <tr>
-                            <td class="mono text-sm"><?= date('d/m/Y H:i', strtotime($r['data_hora'])) ?></td>
-                            <td>
-                                <a href="internamento_detalhe.php?id=<?= $r['id_internamento'] ?>" class="fw-600">
-                                    <?= htmlspecialchars($r['paciente']) ?>
-                                </a>
-                                <div class="text-sm text-muted">Int. #<?= $r['id_internamento'] ?></div>
-                            </td>
-                            <td>
-                                <span class="badge badge-red">
-                                    <?= $tipos_label[$r['tipo_evento']] ?? $r['tipo_evento'] ?>
-                                </span>
-                            </td>
-                            <td><?= gravidade_badge($r['gravidade']) ?></td>
-                            <td class="text-sm"><?= htmlspecialchars($r['profissional']) ?></td>
-                            <td class="text-sm" style="max-width:200px">
-                                <span title="<?= htmlspecialchars($r['descricao']) ?>">
-                                    <?= htmlspecialchars(substr($r['descricao'], 0, 70)) ?><?= strlen($r['descricao']) > 70 ? '…' : '' ?>
-                                </span>
-                            </td>
-                            <td class="text-sm" style="max-width:180px">
-                                <span title="<?= htmlspecialchars($r['intervencao_realizada']) ?>">
-                                    <?= htmlspecialchars(substr($r['intervencao_realizada'], 0, 60)) ?><?= strlen($r['intervencao_realizada']) > 60 ? '…' : '' ?>
-                                </span>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                    <?php if (empty($rows)): ?>
-                        <tr>
-                            <td colspan="7" class="text-muted text-sm" style="text-align:center;padding:32px">
-                                <i class="ti ti-mood-happy" style="font-size:32px;display:block;margin-bottom:8px;color:var(--success)"></i>
-                                Nenhum evento crítico registado
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+    <?php endif; ?>
+
+    <div class="stats-grid mb-4">
+        <div class="stat-card red">
+            <div class="stat-icon"><i class="ti ti-alert-triangle" style="color:var(--danger)"></i></div>
+            <div class="stat-label">Hoje</div>
+            <div class="stat-value"><?= $stats_hoje ?></div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="ti ti-circle-check" style="color:var(--success)"></i></div>
+            <div class="stat-label">Gravidade Baixa</div>
+            <div class="stat-value"><?= $stats_grav['baixa'] ?? 0 ?></div>
+        </div>
+        <div class="stat-card amber">
+            <div class="stat-icon"><i class="ti ti-alert-circle" style="color:var(--warning)"></i></div>
+            <div class="stat-label">Gravidade Moderada</div>
+            <div class="stat-value"><?= $stats_grav['moderada'] ?? 0 ?></div>
+        </div>
+        <div class="stat-card red">
+            <div class="stat-icon"><i class="ti ti-flame" style="color:var(--danger)"></i></div>
+            <div class="stat-label">Gravidade Elevada</div>
+            <div class="stat-value"><?= ($stats_grav['elevada'] ?? 0) + ($stats_grav['critica'] ?? 0) ?></div>
         </div>
     </div>
 
-    <!-- Sidebar de estatísticas por tipo -->
-    <div>
+    <?php if ($filtro_int): ?>
+        <?php
+        $ii = $pdo->prepare("SELECT p.nome FROM INTERNAMENTO i JOIN PACIENTE p ON p.id_paciente=i.id_paciente WHERE i.id_internamento=?");
+        $ii->execute([$filtro_int]);
+        $ii = $ii->fetch();
+        ?>
+        <div class="alert alert-warning mb-4">
+            <i class="ti ti-filter"></i>
+            A filtrar por internamento #<?= $filtro_int ?> — <strong><?= htmlspecialchars($ii['nome'] ?? '') ?></strong>
+            &nbsp;<a href="eventos.php" class="btn btn-outline btn-sm">Ver todos</a>
+        </div>
+    <?php endif; ?>
+
+    <div class="flex items-center justify-between mb-4">
+        <div class="flex gap-2" style="flex-wrap:wrap">
+            <a href="eventos.php<?= $filtro_int ? "?internamento=$filtro_int" : '' ?>" class="btn <?= !$filtro_grav ? 'btn-primary' : 'btn-outline' ?> btn-sm">Todos</a>
+            <?php foreach (['baixa', 'moderada', 'elevada', 'critica'] as $g): ?>
+                <a href="?<?= $filtro_int ? "internamento=$filtro_int&" : '' ?>gravidade=<?= $g ?>"
+                    class="btn <?= $filtro_grav === $g ? 'btn-primary' : 'btn-outline' ?> btn-sm">
+                    <?= ucfirst($g) ?>
+                </a>
+            <?php endforeach; ?>
+        </div>
+        <div class="flex gap-3 items-center">
+            <form method="get" style="display:flex;gap:8px;align-items:center">
+                <?php if ($filtro_int): ?><input type="hidden" name="internamento" value="<?= $filtro_int ?>"><?php endif; ?>
+                <div class="search-bar">
+                    <i class="ti ti-search"></i>
+                    <input type="text" name="q" placeholder="Pesquisar paciente…" value="<?= htmlspecialchars($search) ?>">
+                </div>
+            </form>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-novo')">
+                <i class="ti ti-plus"></i> Registar Evento
+            </button>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start">
+
         <div class="card">
             <div class="card-header">
-                <span class="card-title"><i class="ti ti-chart-bar"></i> Por Tipo</span>
+                <span class="card-title" style="color:var(--danger)"><i class="ti ti-alert-triangle"></i> Eventos Críticos</span>
+                <span class="text-sm text-muted"><?= count($rows) ?> registos</span>
             </div>
-            <div class="card-body" style="padding:16px">
-                <?php if (empty($stats_tipo)): ?>
-                    <div class="text-muted text-sm">Sem dados</div>
-                <?php else: ?>
-                    <?php
-                    $max_tipo = max(array_column($stats_tipo, 'n'));
-                    foreach ($stats_tipo as $st):
-                        $pct = $max_tipo > 0 ? round($st['n'] / $max_tipo * 100) : 0;
-                    ?>
-                        <div style="margin-bottom:12px">
-                            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-                                <span class="text-sm"><?= $tipos_label[$st['tipo_evento']] ?? $st['tipo_evento'] ?></span>
-                                <span class="mono text-sm fw-600"><?= $st['n'] ?></span>
-                            </div>
-                            <div style="height:6px;background:var(--border);border-radius:3px">
-                                <div style="height:100%;width:<?= $pct ?>%;background:var(--danger);border-radius:3px;transition:width .4s"></div>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Paciente</th>
+                            <th>Tipo</th>
+                            <th>Gravidade</th>
+                            <th>Profissional</th>
+                            <th>Descrição</th>
+                            <th>Intervenção</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($rows as $r): ?>
+                            <tr>
+                                <td class="mono text-sm"><?= date('d/m/Y H:i', strtotime($r['data_hora'])) ?></td>
+                                <td>
+                                    <a href="internamento_detalhe.php?id=<?= $r['id_internamento'] ?>" class="fw-600">
+                                        <?= htmlspecialchars($r['paciente']) ?>
+                                    </a>
+                                    <div class="text-sm text-muted">Int. #<?= $r['id_internamento'] ?></div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-red">
+                                        <?= $tipos_label[$r['tipo_evento']] ?? $r['tipo_evento'] ?>
+                                    </span>
+                                </td>
+                                <td><?= gravidade_badge($r['gravidade']) ?></td>
+                                <td class="text-sm"><?= htmlspecialchars($r['profissional']) ?></td>
+                                <td class="text-sm" style="max-width:200px">
+                                    <span title="<?= htmlspecialchars($r['descricao']) ?>">
+                                        <?= htmlspecialchars(substr($r['descricao'], 0, 70)) ?><?= strlen($r['descricao']) > 70 ? '…' : '' ?>
+                                    </span>
+                                </td>
+                                <td class="text-sm" style="max-width:180px">
+                                    <span title="<?= htmlspecialchars($r['intervencao_realizada']) ?>">
+                                        <?= htmlspecialchars(substr($r['intervencao_realizada'], 0, 60)) ?><?= strlen($r['intervencao_realizada']) > 60 ? '…' : '' ?>
+                                    </span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        <?php if (empty($rows)): ?>
+                            <tr>
+                                <td colspan="7" class="text-muted text-sm" style="text-align:center;padding:32px">
+                                    <i class="ti ti-mood-happy" style="font-size:32px;display:block;margin-bottom:8px;color:var(--success)"></i>
+                                    Nenhum evento crítico registado
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
+
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title"><i class="ti ti-chart-bar"></i> Por Tipo</span>
+                </div>
+                <div class="card-body" style="padding:16px">
+                    <?php if (empty($stats_tipo)): ?>
+                        <div class="text-muted text-sm">Sem dados</div>
+                    <?php else: ?>
+                        <?php
+                        $max_tipo = max(array_column($stats_tipo, 'n'));
+                        foreach ($stats_tipo as $st):
+                            $pct = $max_tipo > 0 ? round($st['n'] / $max_tipo * 100) : 0;
+                        ?>
+                            <div style="margin-bottom:12px">
+                                <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                                    <span class="text-sm"><?= $tipos_label[$st['tipo_evento']] ?? $st['tipo_evento'] ?></span>
+                                    <span class="mono text-sm fw-600"><?= $st['n'] ?></span>
+                                </div>
+                                <div style="height:6px;background:var(--border);border-radius:3px">
+                                    <div style="height:100%;width:<?= $pct ?>%;background:var(--danger);border-radius:3px;transition:width .4s"></div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 </div>
-
-<!-- Modal Novo Evento -->
-<div class="modal-overlay" id="modal-novo">
+<div class="modal-overlay" id="modal-novo" style="display: none;">
     <div class="modal" style="max-width:680px">
         <div class="modal-header">
             <span class="modal-title" style="color:var(--danger)">
@@ -339,17 +337,35 @@ $tipos_label = [
     </div>
 </div>
 
+
 <script>
     function openModal(id) {
-        document.getElementById(id).classList.add('open');
+        var overlay = document.getElementById(id);
+        if (!overlay) return;
+
+        overlay.style.display = "flex";
+        setTimeout(function() {
+            overlay.classList.add('open');
+        }, 10);
     }
 
     function closeModal(id) {
-        document.getElementById(id).classList.remove('open');
+        var overlay = document.getElementById(id);
+        if (!overlay) return;
+
+        overlay.classList.remove('open');
+        setTimeout(function() {
+            if (!overlay.classList.contains('open')) {
+                overlay.style.display = "none";
+            }
+        }, 200);
     }
+
     document.querySelectorAll('.modal-overlay').forEach(m => {
         m.addEventListener('click', e => {
-            if (e.target === m) m.classList.remove('open');
+            if (e.target === m) {
+                closeModal(m.id);
+            }
         });
     });
 </script>
