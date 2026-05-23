@@ -60,4 +60,12 @@ O CSS foi reconstruído utilizando uma arquitetura baseada em variáveis nativas
 * **Design Acessível:** Contrastes de cores otimizados para ambientes hospitalares de alta luminosidade.
 
 ---
-*Desenvolvido por José Maria Alves, Tomás Matos, Ivan Mubai e António Urdaneta.*
+*Desenvolvido por Tomás Maio Matos, José Maria Alves, Ivan Mubai e António Urdaneta.*
+
+## License / Copyright
+
+Copyright (c) 2026 Tomás Maio Matos. All rights reserved. 
+
+This code is provided solely for educational purposes and personal review. 
+No permission is granted to copy, distribute, modify, or use this software 
+in any project or application.
