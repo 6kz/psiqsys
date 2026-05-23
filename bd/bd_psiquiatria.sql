@@ -1020,32 +1020,8 @@ VALUES
 -- ============================================================
 -- 15. LOGS DE ACESSO
 -- ============================================================
-INSERT INTO LOG_ACESSO
-  (id_utilizador, id_paciente, tabela_acedida, id_registo, acao, data_hora, ip_origem)
-VALUES
-(1,1,'INTERNAMENTO',1,'SELECT','2025-05-01 14:35:00','192.168.1.10'),
-(1,1,'INTERNAMENTO',1,'INSERT','2025-05-01 14:36:00','192.168.1.10'),
-(4,1,'OBSERVACAO_COMPORTAMENTAL',1,'INSERT','2025-05-01 22:05:00','192.168.1.21'),
-(4,1,'ADMINISTRACAO_MEDICACAO',3,'INSERT','2025-05-02 03:05:00','192.168.1.21'),
-(3,3,'INTERNAMENTO',3,'INSERT','2025-05-05 09:20:00','192.168.1.11'),
-(6,3,'OBSERVACAO_COMPORTAMENTAL',6,'INSERT','2025-05-05 22:10:00','192.168.1.23'),
-(6,3,'EVENTO_CRITICO',1,'INSERT','2025-05-06 14:05:00','192.168.1.23'),
-(1,6,'INTERNAMENTO',6,'INSERT','2025-05-10 11:05:00','192.168.1.10'),
-(4,6,'EVENTO_CRITICO',3,'INSERT','2025-05-10 23:35:00','192.168.1.21'),
-(8,NULL,'PACIENTE',NULL,'SELECT','2025-05-11 09:00:00','192.168.1.30'),
-(1,NULL,'INTERNAMENTO',NULL,'SELECT','2025-05-11 10:00:00','192.168.1.10'),
--- Tentativa de login falhada (teste de segurança)
-(8,NULL,'UTILIZADOR',8,'FALHA_LOGIN','2025-05-11 03:22:00','10.0.0.99'),
-(8,NULL,'UTILIZADOR',8,'FALHA_LOGIN','2025-05-11 03:22:15','10.0.0.99'),
-(8,NULL,'UTILIZADOR',8,'FALHA_LOGIN','2025-05-11 03:22:31','10.0.0.99'),
--- Logins normais
-(2,NULL,'UTILIZADOR',2,'LOGIN','2025-05-12 08:00:00','192.168.1.12'),
-(5,NULL,'UTILIZADOR',5,'LOGIN','2025-05-12 07:55:00','192.168.1.22'),
-(2,2,'ALTA_CLINICA',1,'INSERT','2025-03-28 11:05:00','192.168.1.12'),
-(2,4,'ALTA_CLINICA',2,'INSERT','2025-03-01 10:05:00','192.168.1.12');
 
-
-SET FOREIGN_KEY_CHECKS = 1;
+-- Removi para não encher a log_acesso com dados fake
 
 -- ============================================================
 -- QUERIES DE VERIFICAÇÃO
