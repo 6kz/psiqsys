@@ -28,8 +28,6 @@
 - [ ] Criar um user para cada um
 - [ ] Criar página de administração de medicação
 - [ ] Ter uma forma de ocultar dados sensíveis (Oculto), OnClick aparecia
-- [ ] Administrativos apenas podem visualizar dados do paciente, e internamento
-
 
 ---
 
@@ -38,3 +36,4 @@
 - [x] Adição da hora juntamente com a data no topbar
 - [x] Permitir à equipa de TI eliminar pacientes
 - [x] Adicionar botão de logout
+- [x] Administrativos apenas podem visualizar dados do paciente, e internamento
