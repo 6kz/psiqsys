@@ -21,7 +21,6 @@
 
 ### 🔐 Sistema
 
-- [ ] Adicionar botão de logout
 - [ ] Após x minutos offline session_destroy()
 - [ ] Recuperar a palavra-passe (mudar a password de 90d em 90d?)
 - [ ] Mudar a palavra-passe no login (password_recovery.php) | user, password antiga, password nova e confirmação password nova
@@ -35,3 +34,5 @@
 
 - [x] Adição da hora juntamente com a data no topbar
 - [x] Permitir à equipa de TI eliminar pacientes
+- [x] Adicionar botão de logout
+
