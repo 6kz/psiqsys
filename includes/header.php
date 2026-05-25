@@ -84,3 +84,32 @@
                     <span class="topbar-hour" id="clock"></span>
                 </div>
             </div>
+
+            <?php
+            require_once __DIR__ . '/auditoria.php';
+
+            // 2. Registar automaticamente o acesso de leitura (SELECT) à página atual
+            if (isset($pdo) && isset($pagina_atual)) {
+
+                // Mapeamento opcional para sabermos a tabela principal de cada página
+                $tabelas_por_pagina = [
+                    'dashboard'   => 'DASHBOARD',
+                    'pacientes'   => 'PACIENTE',
+                    'prescricoes' => 'PRESCRICAO',
+                    'internamentos' => 'INTERNAMENTO',
+                    'eventos' => 'EVENTOS',
+                    'observacoes' => 'OBSERVACOES',
+                    'camas' => 'CAMAS',
+                ];
+
+                $tabela_alvo = $tabelas_por_pagina[$pagina_atual] ?? 'SISTEMA';
+
+                // Se houver uma pesquisa ativa na barra de pesquisa (?q=), grava como SEARCH
+                $acao_detectada = (!empty($_GET['q'])) ? 'SEARCH' : 'SELECT';
+
+                // Tenta capturar o ID do paciente ou internamento se estiver na URL (?internamento= ou ?id=)
+                $id_paciente_contexto = isset($_GET['internamento']) ? (int)$_GET['internamento'] : null;
+
+                registarLog($pdo, $tabela_alvo, $acao_detectada, null, $id_paciente_contexto);
+            }
+            ?>
