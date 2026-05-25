@@ -1,10 +1,10 @@
 <?php
 
-//      $password = "administrativo";
+//  $password = "administrativo";
 
-      // Generate a secure Bcrypt hash
-//     $hash = password_hash($password, PASSWORD_BCRYPT);
-//        echo $hash;
+    // Generate a secure Bcrypt hash
+//  $hash = password_hash($password, PASSWORD_BCRYPT);
+//  echo $hash;
 session_start();
 require_once 'includes/db.php';
 
