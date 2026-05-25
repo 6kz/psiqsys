@@ -22,7 +22,7 @@ if (isset($_SESSION['LAST_ACTIVITY'])) {
     if ($tempo_inativo > $tempo_limite) {
         session_unset();
         session_destroy();
-        header("Location: index.php?timeout=1");
+        header("Location: index.php");
         exit;
     }
 }
