@@ -210,7 +210,7 @@ function estado_badge(string $e): string
                 </thead>
                 <tbody>
                     <?php foreach ($rows as $r): ?>
-                        <tr style="<?= in_array($r['estado'], ['concluida', 'cancelada']) ? 'opacity: 0.65; background-color: var(--card-bg-dim, #fafafa);' : '' ?>">
+                        <tr class="<?= in_array($r['estado'], ['concluida', 'cancelada']) ? 'row-dimmed' : '' ?>">
                             <td class="mono text-muted"><?= (int)$r['id_prescricao'] ?></td>
                             <td>
                                 <div class="fw-600"><?= htmlspecialchars($r['paciente']) ?></div>

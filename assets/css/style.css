@@ -15,6 +15,9 @@
     --border: #dde4ee;
     --border-dark: #c5d0df;
 
+    --card-bg-dim: #f8fafc;
+    --text-dimmed: #64748b;
+
     /* Primária — azul mais vibrante e profissional */
     --primary: #2563eb;
     --primary-dark: #1d4ed8;
@@ -1252,6 +1255,8 @@ footer {
     --shadow: 0 1px 3px rgba(0, 0, 0, .4);
     --shadow-md: 0 6px 18px rgba(0, 0, 0, .5);
     --shadow-lg: 0 12px 30px rgba(0, 0, 0, .6);
+    --card-bg-dim: #111c2a;
+    --text-dimmed: #64748b;
 }
 
 [data-theme="dark"] .topbar {
@@ -1372,4 +1377,25 @@ footer {
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
+}
+
+/* ============================================================
+   ESTILOS PARA LINHAS CONCLUÍDAS / CANCELADAS (Row Dimmed)
+   ============================================================ */
+tr.row-dimmed {
+    background-color: var(--card-bg-dim) !important;
+}
+
+/* Afeta o texto geral da linha e os elementos com classes de texto mutado */
+tr.row-dimmed td,
+tr.row-dimmed td .fw-600,
+tr.row-dimmed td .text-muted,
+tr.row-dimmed td .mono {
+    color: var(--text-dimmed) !important;
+}
+
+/* Garante que os badges dentro das linhas concluídas também acompanham o tom neutro */
+tr.row-dimmed .badge {
+    opacity: 0.5;
+    filter: grayscale(1);
 }
