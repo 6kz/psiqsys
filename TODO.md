@@ -27,6 +27,8 @@
 - [ ] Criar um user para cada um
 - [ ] Criar página de administração de medicação
 - [ ] Ter uma forma de ocultar dados sensíveis (Oculto), OnClick aparecia
+- [ ] Administrativos só podem acessar dados do paciente e não dados clinicos
+- [ ] Adicionar auditoria.php a todos os ficheiros
 
 ---
 
