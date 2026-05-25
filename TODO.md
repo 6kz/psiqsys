@@ -5,7 +5,6 @@
 ### 👥 Pacientes
 
 - [ ] Melhorar a visualização das observações clínicas e eventos críticos
-- [ ] Mostrar pacientes desativos com tag desativo (SÓ COM BUSCA)
 
 ### 💊 Prescrições
 
@@ -28,6 +27,8 @@
 - [ ] Criar um user para cada um
 - [ ] Criar página de administração de medicação
 - [ ] Ter uma forma de ocultar dados sensíveis (Oculto), OnClick aparecia
+- [ ] Administrativos só podem acessar dados do paciente e não dados clinicos
+- [ ] Adicionar auditoria.php a todos os ficheiros
 
 ---
 
@@ -37,3 +38,4 @@
 - [x] Permitir à equipa de TI eliminar pacientes
 - [x] Adicionar botão de logout
 - [x] Administrativos apenas podem visualizar dados do paciente, e internamento
+- [x] Mostrar pacientes desativos com tag desativo (SÓ COM BUSCA)
