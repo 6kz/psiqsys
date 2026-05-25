@@ -1,5 +1,6 @@
 <?php
-session_start();
+require_once 'includes/auth.php';
+require_once 'includes/db.php';
 
 if (empty($_SESSION['currentID'])) {
     header('refresh:3; url=index.php');
