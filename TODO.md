@@ -5,7 +5,6 @@
 ### 👥 Pacientes
 
 - [ ] Melhorar a visualização das observações clínicas e eventos críticos
-- [ ] Mostrar pacientes desativos com tag desativo (SÓ COM BUSCA)
 
 ### 💊 Prescrições
 
@@ -37,3 +36,4 @@
 - [x] Permitir à equipa de TI eliminar pacientes
 - [x] Adicionar botão de logout
 - [x] Administrativos apenas podem visualizar dados do paciente, e internamento
+- [x] Mostrar pacientes desativos com tag desativo (SÓ COM BUSCA)
