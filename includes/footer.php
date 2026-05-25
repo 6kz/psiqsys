@@ -62,6 +62,41 @@
             });
         });
     </script>
+<script>
+    const SESSION_TIMEOUT = 10 * 60 * 1000; // 10 minutos até auto-logout / session destroy
 
+    setTimeout(() => {
+        // esconde imediatamente a informação visível
+        document.body.innerHTML = `
+            <div style="
+                min-height:100vh;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-family:Arial, sans-serif;
+                background:#eef2f6;
+                color:#1f2937;
+            ">
+                <div style="
+                    background:white;
+                    border:1px solid #d8e0e8;
+                    padding:30px;
+                    max-width:420px;
+                    text-align:center;
+                ">
+                    <h2>Sessão expirada</h2>
+                    <p>A sessão foi terminada por inatividade.</p>
+                    <p>Será redirecionado para o login.</p>
+                </div>
+            </div>
+        `;
+
+        // redireciona para logout para destruir sessão no servidor
+        setTimeout(() => {
+            window.location.href = 'logout.php?timeout=1';
+        }, 1000);
+
+    }, SESSION_TIMEOUT);
+</script>
 </body>
 </html>
