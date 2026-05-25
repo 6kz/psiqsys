@@ -679,13 +679,13 @@ INSERT IGNORE INTO PROFISSIONAL (id_profissional, nome, funcao, num_cedula) VALU
 -- ============================================================
 INSERT IGNORE INTO UTILIZADOR (id_profissional, username, password_hash) VALUES
   (1,'ana.ferreira',   '$2y$10$rtxqxGGhcTTy62bzsCZEa.bIPedHGh7DBr7FBrkZblj9l9.rXogM6'),
-  (2,'rui.mendes',     '$2b$12$testHashMedico2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'),
-  (3,'sofia.carvalho', '$2b$12$testHashMedico3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'),
+  (2,'rui.mendes',     '$2y$10$rtxqxGGhcTTy62bzsCZEa.bIPedHGh7DBr7FBrkZblj9l9.rXogM6'),
+  (3,'sofia.carvalho', '$2y$10$rtxqxGGhcTTy62bzsCZEa.bIPedHGh7DBr7FBrkZblj9l9.rXogM6'),
   (4,'joao.santos',    '$2y$10$cD2UgShr2LLAHotycNGJDuENpt3XFpvOJHNN/OAE8aOLmqkl0HVyW'),
-  (5,'carla.rodrigues','$2b$12$testHashEnf2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'),
-  (6,'miguel.fonseca', '$2b$12$testHashEnf3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'),
-  (7,'beatriz.lima',   '$2y$10$sh.kcFeOd49EDFJ80eQnoOlH1UodeNHpAWdFTL9DYjk...'),
-  (8,'teresa.neves',   '$2b$12$testHashAdm1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+  (5,'carla.rodrigues','$2y$10$cD2UgShr2LLAHotycNGJDuENpt3XFpvOJHNN/OAE8aOLmqkl0HVyW'),
+  (6,'miguel.fonseca', '$2y$10$cD2UgShr2LLAHotycNGJDuENpt3XFpvOJHNN/OAE8aOLmqkl0HVyW'),
+  (7,'beatriz.lima',   '$2y$10$cD2UgShr2LLAHotycNGJDuENpt3XFpvOJHNN/OAE8aOLmqkl0HVyW'),
+  (8,'teresa.neves',   '$2y$10$3JwURJ9kYgF4asWeBLYoVeYQgJRoIJXj2f22nmu7wSkEpOVfHDmDi');
 
 INSERT IGNORE INTO UTILIZADOR (id_profissional, username, password_hash) VALUES
   (1000, 'admin_psiqsys_0', '$2y$10$KpyI6G6zMcEy1Uqis9W1RuouLp2sfzEmqoZbm2ZezDcMvFmhrEi4a');
