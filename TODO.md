@@ -15,12 +15,10 @@
 ### 🛏️ Camas & Internamentos
 
 - [ ] Permitir aos enfermeiros gerir camas e quartos
-- [ ] Mudar fonte de dark mode
 - [ ] Adicionar diárias aos internamentos
 
 ### 🔐 Sistema
 
-- [ ] Após x minutos offline session_destroy()
 - [ ] Recuperar a palavra-passe (mudar a password de 90d em 90d?)
 - [ ] Mudar a palavra-passe no login (password_recovery.php) | user, password antiga, password nova e confirmação password nova
 - [ ] Conseguir por o auditoria.php a funcionar em todas as paginas
@@ -28,7 +26,6 @@
 - [ ] Criar página de administração de medicação
 - [ ] Ter uma forma de ocultar dados sensíveis (Oculto), OnClick aparecia
 - [ ] Administrativos só podem acessar dados do paciente e não dados clinicos
-- [ ] Adicionar auditoria.php a todos os ficheiros
 
 ---
 
@@ -39,3 +36,5 @@
 - [x] Adicionar botão de logout
 - [x] Administrativos apenas podem visualizar dados do paciente, e internamento
 - [x] Mostrar pacientes desativos com tag desativo (SÓ COM BUSCA)
+- [x] Mudar fonte de dark mode
+- [x] Após x minutos offline session_destroy()

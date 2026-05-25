@@ -15,6 +15,9 @@
     --border: #dde4ee;
     --border-dark: #c5d0df;
 
+    --card-bg-dim: #f8fafc;
+    --text-dimmed: #64748b;
+
     /* Primária — azul mais vibrante e profissional */
     --primary: #2563eb;
     --primary-dark: #1d4ed8;
@@ -57,6 +60,15 @@
     /* Animação */
     --ease: cubic-bezier(0.4, 0, 0.2, 1);
     --transition: .16s var(--ease);
+
+    --bg-cama-disponivel: #eafaf1;
+    --border-cama-disponivel: var(--success);
+    --bg-cama-ocupada: #fdf2f2;
+    --border-cama-ocupada: var(--danger);
+    --bg-cama-interdita: #fdf9ea;
+    --border-cama-interdita: var(--warning);
+    --bg-cama-manutencao: #f4f5f7;
+    --border-cama-manutencao: var(--border-dark);
 }
 
 /* ── Reset ─────────────────────────────────────────────────── */
@@ -1252,6 +1264,16 @@ footer {
     --shadow: 0 1px 3px rgba(0, 0, 0, .4);
     --shadow-md: 0 6px 18px rgba(0, 0, 0, .5);
     --shadow-lg: 0 12px 30px rgba(0, 0, 0, .6);
+    --card-bg-dim: #111c2a;
+    --text-dimmed: #64748b;
+    --bg-cama-disponivel: rgba(46, 204, 113, 0.08);
+    --border-cama-disponivel: rgba(46, 204, 113, 0.4);
+    --bg-cama-ocupada: rgba(231, 76, 60, 0.08);
+    --border-cama-ocupada: rgba(231, 76, 60, 0.4);
+    --bg-cama-interdita: rgba(241, 196, 15, 0.08);
+    --border-cama-interdita: rgba(241, 196, 15, 0.4);
+    --bg-cama-manutencao: rgba(255, 255, 255, 0.03);
+    --border-cama-manutencao: rgba(255, 255, 255, 0.15);
 }
 
 [data-theme="dark"] .topbar {
@@ -1372,4 +1394,183 @@ footer {
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
+}
+
+/* ============================================================
+   ESTILOS PARA LINHAS CONCLUÍDAS / CANCELADAS (Row Dimmed)
+   ============================================================ */
+tr.row-dimmed {
+    background-color: var(--card-bg-dim) !important;
+}
+
+/* Afeta o texto geral da linha e os elementos com classes de texto mutado */
+tr.row-dimmed td,
+tr.row-dimmed td .fw-600,
+tr.row-dimmed td .text-muted,
+tr.row-dimmed td .mono {
+    color: var(--text-dimmed) !important;
+}
+
+/* Garante que os badges dentro das linhas concluídas também acompanham o tom neutro */
+tr.row-dimmed .badge {
+    opacity: 0.5;
+    filter: grayscale(1);
+}
+
+
+/* Layout Grid Interno dos Quartos */
+.camas-layout-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    padding: 20px;
+}
+
+/* Card Interativo Individual */
+.cama-interactive-card {
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.cama-interactive-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Mapeamento Dinâmico de Estados Baseado em Variáveis Semânticas */
+.cama-status-disponivel {
+    background: var(--bg-cama-disponivel);
+    border-color: var(--border-cama-disponivel);
+}
+
+.cama-status-ocupada {
+    background: var(--bg-cama-ocupada);
+    border-color: var(--border-cama-ocupada);
+}
+
+.cama-status-interdita {
+    background: var(--bg-cama-interdita);
+    border-color: var(--border-cama-interdita);
+}
+
+.cama-status-manutencao {
+    background: var(--bg-cama-manutencao);
+    border-color: var(--border-cama-manutencao);
+}
+
+/* Detalhes internos do Card */
+.cama-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.cama-card-number {
+    font-size: 1.3rem;
+    font-weight: 700;
+    font-family: var(--mono);
+    color: var(--text);
+}
+
+.cama-card-id {
+    font-size: 0.75rem;
+    color: var(--text-2);
+}
+
+.cama-card-body {
+    margin-bottom: 14px;
+    flex-grow: 1;
+}
+
+.cama-patient-info {
+    font-size: 0.85rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+}
+
+.cama-patient-info i {
+    font-size: 14px;
+    color: var(--text-2);
+}
+
+.cama-empty-info {
+    font-size: 0.8rem;
+    color: var(--text-3);
+    font-style: italic;
+}
+
+/* Formulário e Elementos de Ação */
+.cama-card-actions {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding-top: 10px;
+}
+
+body.dark-mode .cama-card-actions {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cama-action-form {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.select-cama-sm {
+    font-size: 0.78rem;
+    padding: 4px 8px;
+    height: 28px;
+    background-color: var(--bg-card);
+    color: var(--text);
+}
+
+.cama-managed-text {
+    font-size: 0.75rem;
+    color: var(--text-3);
+    display: block;
+    text-align: center;
+}
+
+/* Helper para barra de progresso no Stat Card */
+.progress-bar-container {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+}
+
+/* Container de Estado Vazio (Camas não encontradas) */
+.empty-state-container {
+    text-align: center;
+    padding: 48px;
+    color: var(--text-3);
+}
+
+.empty-state-container i {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 12px;
+}
+
+/* Classes extra para mini botões se não existirem no core */
+.btn-xs {
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    border-radius: 4px;
 }

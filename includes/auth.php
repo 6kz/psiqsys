@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$tempo_limite = 350; // 5 minutos
+$tempo_limite = 300; // 5 minutos
 
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
@@ -22,7 +22,7 @@ if (isset($_SESSION['LAST_ACTIVITY'])) {
     if ($tempo_inativo > $tempo_limite) {
         session_unset();
         session_destroy();
-        header("Location: index.php?timeout=1");
+        header("Location: index.php");
         exit;
     }
 }
