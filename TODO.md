@@ -24,8 +24,6 @@
 - [ ] Conseguir por o auditoria.php a funcionar em todas as paginas
 - [ ] Criar um user para cada um
 - [ ] Criar página de administração de medicação
-- [ ] Ter uma forma de ocultar dados sensíveis (Oculto), OnClick aparecia
-- [ ] Administrativos só podem acessar dados do paciente e não dados clinicos
 
 ---
 
@@ -38,3 +36,5 @@
 - [x] Mostrar pacientes desativos com tag desativo (SÓ COM BUSCA)
 - [x] Mudar fonte de dark mode
 - [x] Após x minutos offline session_destroy()
+- [x] Administrativos só podem acessar dados do paciente e não dados clinicos
+- [x] Ter uma forma de ocultar dados sensíveis (Oculto), OnClick aparecia
