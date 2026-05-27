@@ -3,7 +3,7 @@ require_once 'includes/auth.php';
 require_once 'includes/db.php';
 
 require_once 'includes/db.php';
-require_once 'includes/auditoria.php';
+require_once 'auditoria.php';
 
 $pagina_atual  = 'pacientes';
 $titulo_pagina = 'Pacientes';
