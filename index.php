@@ -2,7 +2,7 @@
 
 //  $password = "administrativo";
 
-    // Generate a secure Bcrypt hash
+// Generate a secure Bcrypt hash
 //  $hash = password_hash($password, PASSWORD_BCRYPT);
 //  echo $hash;
 session_start();
@@ -45,7 +45,12 @@ LIMIT 1
     $_SESSION['currentLogin'] = $linha["username"];
     $_SESSION['currentFuncao'] = $linha["funcao"];
 
-    header('Location: dashboard.php');
+    if (($_SESSION['currentFuncao'] === 'administrativo' || $_SESSION['currentFuncao'] === 'administrative')) {
+      header('Location: pacientes');
+      exit;
+    }
+
+    header('Location: dashboard');
     exit;
   }
 
@@ -89,7 +94,7 @@ LIMIT 1
         </div>
       <?php endif; ?>
 
-      <form method="post" action="index.php" class="login-form">
+      <form method="post" action="index" class="login-form">
 
         <div class="form-group">
           <label class="form-label" for="login">Utilizador</label>

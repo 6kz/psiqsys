@@ -1,9 +1,10 @@
 <?php
 require_once 'includes/auth.php';
 require_once 'includes/db.php';
+require_once 'includes/logger.php';
 
 if (isset($_SESSION['currentFuncao']) && ($_SESSION['currentFuncao'] === 'administrativo' || $_SESSION['currentFuncao'] === 'administrative')) {
-    header('Location: pacientes.php?erro=sem_permissao');
+    header('Location: pacientes?erro=sem_permissao');
     exit;
 }
 
@@ -29,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'novo'
         $_POST['gravidade'],
     ]);
     $redir = (int)$_POST['id_internamento'];
-    header("Location: eventos.php?ok=1" . ($redir ? "&internamento=$redir" : ''));
+    header("Location: eventos?ok=1" . ($redir ? "&internamento=$redir" : ''));
     exit;
 }
 
@@ -148,13 +149,13 @@ $tipos_label = [
         <div class="alert alert-warning mb-4">
             <i class="ti ti-filter"></i>
             A filtrar por internamento #<?= $filtro_int ?> — <strong><?= htmlspecialchars($ii['nome'] ?? '') ?></strong>
-            &nbsp;<a href="eventos.php" class="btn btn-outline btn-sm">Ver todos</a>
+            &nbsp;<a href="eventos" class="btn btn-outline btn-sm">Ver todos</a>
         </div>
     <?php endif; ?>
 
     <div class="flex items-center justify-between mb-4">
         <div class="flex gap-2" style="flex-wrap:wrap">
-            <a href="eventos.php<?= $filtro_int ? "?internamento=$filtro_int" : '' ?>" class="btn <?= !$filtro_grav ? 'btn-primary' : 'btn-outline' ?> btn-sm">Todos</a>
+            <a href="eventos<?= $filtro_int ? "?internamento=$filtro_int" : '' ?>" class="btn <?= !$filtro_grav ? 'btn-primary' : 'btn-outline' ?> btn-sm">Todos</a>
             <?php foreach (['baixa', 'moderada', 'elevada', 'critica'] as $g): ?>
                 <a href="?<?= $filtro_int ? "internamento=$filtro_int&" : '' ?>gravidade=<?= $g ?>"
                     class="btn <?= $filtro_grav === $g ? 'btn-primary' : 'btn-outline' ?> btn-sm">
@@ -201,7 +202,7 @@ $tipos_label = [
                             <tr>
                                 <td class="mono text-sm"><?= date('d/m/Y H:i', strtotime($r['data_hora'])) ?></td>
                                 <td>
-                                    <a href="internamento_detalhe.php?id=<?= $r['id_internamento'] ?>" class="fw-600">
+                                    <a href="internamento_detalhe?id=<?= $r['id_internamento'] ?>" class="fw-600">
                                         <?= htmlspecialchars($r['paciente']) ?>
                                     </a>
                                     <div class="text-sm text-muted">Int. #<?= $r['id_internamento'] ?></div>

@@ -1,6 +1,7 @@
 <?php
 require_once 'includes/auth.php';
 require_once 'includes/db.php';
+require_once 'includes/logger.php';
 
 if (isset($_SESSION['currentFuncao']) && ($_SESSION['currentFuncao'] === 'administrativo' || $_SESSION['currentFuncao'] === 'administrative')) {
     header('Location: pacientes.php?erro=sem_permissao');
@@ -96,7 +97,7 @@ $internamentos_ativos = $pdo->query("
 ")->fetchAll();
 
 $medicacoes   = $pdo->query("SELECT * FROM MEDICACAO ORDER BY nome")->fetchAll();
-$profissionais = $pdo->query("SELECT id_profissional, nome, funcao FROM PROFISSIONAL WHERE funcao='medico' ORDER BY nome")->fetchAll();
+$profissionais = $pdo->query("SELECT id_profissional, nome, funcao FROM PROFISSIONAL WHERE funcao='medico' ORDx ER BY nome")->fetchAll();
 
 require_once 'includes/header.php';
 

@@ -1,6 +1,7 @@
 <?php
 require_once 'includes/auth.php';
 require_once 'includes/db.php';
+require_once 'includes/logger.php';
 
 // Determinar se o utilizador logado é administrativo
 // (Ajusta 'administrativo' e 'user_role' se a tua chave na sessão for diferente)
@@ -14,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'alta') {
         $stmt = $pdo->prepare("UPDATE INTERNAMENTO SET data_alta=NOW(), estado_clinico='alta_prevista' WHERE id_internamento=?");
         $stmt->execute([(int)$_POST['id']]);
-        header('Location: internamentos.php?ok=alta');
+        header('Location: internamentos?ok=alta');
         exit;
     }
     if ($_POST['action'] === 'novo') {
@@ -29,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $cama = $checkCama->fetch();
 
         if (!$cama || $cama['estado'] !== 'disponivel') {
-            header('Location: internamentos.php?erro=cama_indisponivel');
+            header('Location: internamentos?erro=cama_indisponivel');
             exit;
         }
 
@@ -58,16 +59,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $pdo->prepare("UPDATE CAMA SET estado='ocupada' WHERE id_cama=?")
                 ->execute([(int)$_POST['id_cama']]);
 
-            header('Location: internamentos.php?ok=novo');
+            header('Location: internamentos?ok=novo');
             exit;
         } catch (PDOException $e) {
             // erro trigger cama ocupada
             if ($e->getCode() == '45000') {
-                header('Location: internamentos.php?erro=cama_ocupada');
+                header('Location: internamentos?erro=cama_ocupada');
                 exit;
             }
             // outros erros
-            header('Location: internamentos.php?erro=geral');
+            header('Location: internamentos?erro=geral');
             exit;
         }
     }
@@ -236,7 +237,7 @@ require_once 'includes/header.php';
                             <td>
                                 <div class="flex gap-2">
                                     <?php if (!$is_administrativo): ?>
-                                        <a href="internamento_detalhes.php?id=<?= $r['id_internamento'] ?>" class="btn btn-outline btn-sm">
+                                        <a href="internamento_detalhes?id=<?= $r['id_internamento'] ?>" class="btn btn-outline btn-sm">
                                             <i class="ti ti-eye"></i>
                                         </a>
                                     <?php endif; ?>

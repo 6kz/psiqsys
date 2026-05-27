@@ -1,11 +1,12 @@
 <?php
 require_once 'includes/auth.php';
 require_once 'includes/db.php';
+require_once 'includes/logger.php';
 
-require_once 'includes/db.php';
+require_once 'includes/db';
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) {
-    header('Location: internamentos.php');
+    header('Location: internamentos');
     exit;
 }
 
@@ -22,7 +23,7 @@ $i = $pdo->prepare("
 $i->execute([$id]);
 $int = $i->fetch();
 if (!$int) {
-    header('Location: internamentos.php');
+    header('Location: internamentos');
     exit;
 }
 
@@ -76,7 +77,7 @@ require_once 'includes/header.php';
 <div class="content-area">
 
     <div class="mb-4">
-        <a href="internamentos.php" class="btn btn-outline btn-sm"><i class="ti ti-arrow-left"></i> Voltar</a>
+        <a href="internamentos" class="btn btn-outline btn-sm"><i class="ti ti-arrow-left"></i> Voltar</a>
     </div>
 
     <div class="card mb-4">
@@ -177,7 +178,7 @@ require_once 'includes/header.php';
     <div class="card mb-4">
         <div class="card-header">
             <span class="card-title"><i class="ti ti-pill"></i> Prescrições</span>
-            <a href="prescricoes.php?internamento=<?= $id ?>" class="btn btn-outline btn-sm">Gerir</a>
+            <a href="prescricoes?internamento=<?= $id ?>" class="btn btn-outline btn-sm">Gerir</a>
         </div>
         <div class="table-wrap">
             <table>
@@ -215,7 +216,7 @@ require_once 'includes/header.php';
     <div class="card mb-4">
         <div class="card-header">
             <span class="card-title"><i class="ti ti-clipboard-list"></i> Observações Comportamentais</span>
-            <a href="observacoes.php?internamento=<?= $id ?>" class="btn btn-outline btn-sm">Adicionar</a>
+            <a href="observacoes?internamento=<?= $id ?>" class="btn btn-outline btn-sm">Adicionar</a>
         </div>
         <div class="table-wrap">
             <table>

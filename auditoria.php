@@ -1,89 +1,25 @@
 <?php
+// auditoria.php
 require_once 'includes/auth.php';
 require_once 'includes/db.php';
+require_once 'includes/logger.php'; // Inclui as funções de log caso queiras usar aqui
 
-// Ajustado para refletir a tua variável de sessão de funções ('ti' ou 'diretor')
+// Verificação de permissões (Apenas TI ou Diretor)
 $is_admin = (isset($_SESSION['currentFuncao']) && ($_SESSION['currentFuncao'] === 'ti' || $_SESSION['currentFuncao'] === 'diretor'));
 
-$pagina_atual  = 'auditoria';
-$titulo_pagina = 'Auditoria de Sistema';
-
-// ── FUNÇÕES DE LOG ───────────────────────────────────────────────────
-function getUserIP()
-{
-    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-        $ip = $_SERVER['HTTP_CLIENT_IP'];
-    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $ipList = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-        $ip = trim($ipList[0]);
-    } else {
-        $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-    }
-    return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '0.0.0.0';
-}
-
-function registarLog(
-    PDO $pdo,
-    string $tabela,
-    string $acao_original,
-    ?int $id_registo = null,
-    ?int $id_paciente = null
-) {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-
-    $id_utilizador = $_SESSION['currentID'] ?? 0;
-    $ip = getUserIP();
-
-    $acao = 'SELECT';
-    $acao_upper = strtoupper($acao_original);
-
-    if (strpos($acao_upper, 'SEARCH') !== false || $acao_upper === 'SELECT') {
-        $acao = 'SELECT';
-    } elseif ($acao_upper === 'INSERT') {
-        $acao = 'INSERT';
-    } elseif ($acao_upper === 'UPDATE' || $acao_upper === 'DISABLE') {
-        $acao = 'UPDATE';
-    } elseif ($acao_upper === 'DELETE') {
-        $acao = 'DELETE';
-    }
-
-    try {
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $stmt = $pdo->prepare("
-            INSERT INTO LOG_ACESSO 
-            (id_utilizador, id_paciente, tabela_acedida, id_registo, acao, data_hora, ip_origem)
-            VALUES (?, ?, ?, ?, ?, NOW(), ?)
-        ");
-
-        $stmt->execute([
-            $id_utilizador,
-            $id_paciente,
-            $tabela,
-            $id_registo,
-            $acao,
-            $ip
-        ]);
-    } catch (PDOException $e) {
-        die("Erro crítico ao gravar log de auditoria: " . $e->getMessage());
-    }
-}
-
-// Se for incluído por outro ficheiro para usar a função registarLog, para aqui.
-if (basename($_SERVER['SCRIPT_FILENAME']) !== 'auditoria.php') {
-    return;
-}
-
-// Bloqueia a renderização visual se não for admin
 if (!$is_admin) {
     header('HTTP/1.1 403 Forbidden');
     echo "<div style='padding:40px; font-family:sans-serif; text-align:center;'><h2>Acesso Negado</h2><p>Não tem permissões para visualizar os logs de auditoria.</p></div>";
     exit;
 }
 
-// Filtros
+$pagina_atual  = 'auditoria';
+$titulo_pagina = 'Auditoria de Sistema';
+
+// Opcional: Registar que o administrador visualizou a tabela de auditoria
+// registarLog($pdo, 'LOG_ACESSO', 'SELECT', null, null);
+
+// Filtros da listagem
 $search_user = trim($_GET['user'] ?? '');
 $filter_acao = $_GET['acao'] ?? 'todas';
 
@@ -115,7 +51,7 @@ $stmt = $pdo->prepare("
 $stmt->execute($params);
 $logs = $stmt->fetchAll();
 
-// O cabeçalho carrega aqui (apenas uma vez e no sítio certo)
+// Cabeçalho visual
 require_once 'includes/header.php';
 ?>
 

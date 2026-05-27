@@ -1,7 +1,7 @@
 <?php
 require_once 'includes/auth.php';
 require_once 'includes/db.php';
-require_once 'auditoria.php'; // Garante o acesso às funções de log
+require_once 'includes/logger.php'; // Garante o acesso às funções de log
 
 $pagina_atual  = 'camas';
 $titulo_pagina = 'Gestão de Camas';

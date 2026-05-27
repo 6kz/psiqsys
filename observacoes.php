@@ -1,9 +1,10 @@
 <?php
 require_once 'includes/auth.php';
 require_once 'includes/db.php';
+require_once 'includes/logger.php';
 
 if (isset($_SESSION['currentFuncao']) && ($_SESSION['currentFuncao'] === 'administrativo' || $_SESSION['currentFuncao'] === 'administrative')) {
-    header('Location: pacientes.php?erro=sem_permissao');
+    header('Location: pacientes?erro=sem_permissao');
     exit;
 }
 
@@ -35,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $_POST['notas_clinicas'] ?: null
     ]);
 
-    $redir = $id_internamento ? "observacoes.php?internamento=" . $id_internamento . "&ok=1" : "observacoes.php?ok=1";
+    $redir = $id_internamento ? "observacoes?internamento=" . $id_internamento . "&ok=1" : "observacoes?ok=1";
     header("Location: " . $redir);
     exit;
 }
@@ -85,7 +86,8 @@ require_once 'includes/header.php';
     <div class="flex items-center justify-between mb-4">
         <div>
             <?php if ($id_internamento): ?>
-                <a href="internamento_detalhes.php?id=<?= $id_internamento ?>" class="btn btn-outline btn-sm mb-2 d-inline-flex items-center gap-1">
+                <a href="internamento_detalhes
+?id=<?= $id_internamento ?>" class="btn btn-outline btn-sm mb-2 d-inline-flex items-center gap-1">
                     <i class="ti ti-arrow-left"></i> Voltar ao Internamento
                 </a>
             <?php endif; ?>

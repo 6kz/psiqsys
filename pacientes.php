@@ -1,9 +1,7 @@
 <?php
 require_once 'includes/auth.php';
 require_once 'includes/db.php';
-
-require_once 'includes/db.php';
-require_once 'auditoria.php';
+require_once 'includes/logger.php';
 
 $pagina_atual  = 'pacientes';
 $titulo_pagina = 'Pacientes';
@@ -15,7 +13,7 @@ $funcao_atual = $_SESSION['currentFuncao'] ?? '';
 ========================================================= */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'eliminar') {
     if ($funcao_atual !== 'ti') {
-        header('Location: pacientes.php?erro=sem_permissao');
+        header('Location: pacientes?erro=sem_permissao');
         exit;
     }
 
@@ -43,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'elimi
 
         $pdo->commit();
 
-        header('Location: pacientes.php?ok=delete');
+        header('Location: pacientes?ok=delete');
         exit;
     } catch (PDOException $e) {
         $pdo->rollBack();
@@ -57,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'elimi
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'novo') {
     // Apenas TI e Administrativos podem criar
     if ($funcao_atual !== 'ti' && $funcao_atual !== 'administrativo') {
-        header('Location: pacientes.php?erro=sem_permissao');
+        header('Location: pacientes?erro=sem_permissao');
         exit;
     }
 
@@ -69,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'novo'
         $morada          = trim($_POST['morada'] ?? '');
 
         if (!preg_match('/^\d{9}$/', $num_utente)) {
-            header('Location: pacientes.php?erro=utente_invalido');
+            header('Location: pacientes?erro=utente_invalido');
             exit;
         }
 
@@ -81,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'novo'
         $check->execute([$num_utente]);
 
         if ($check->fetch()) {
-            header('Location: pacientes.php?erro=utente_existente');
+            header('Location: pacientes?erro=utente_existente');
             exit;
         }
 
@@ -95,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'novo'
 
         registarLog($pdo, 'PACIENTE', 'INSERT', $id_paciente, $id_paciente);
 
-        header('Location: pacientes.php?ok=1');
+        header('Location: pacientes?ok=1');
         exit;
     } catch (PDOException $e) {
         die($e->getMessage());
@@ -108,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'novo'
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'editar') {
     // Apenas TI e Administrativos podem editar
     if ($funcao_atual !== 'ti' && $funcao_atual !== 'administrativo') {
-        header('Location: pacientes.php?erro=sem_permissao');
+        header('Location: pacientes?erro=sem_permissao');
         exit;
     }
 
@@ -123,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edita
             $num_utente = trim($_POST['num_utente']);
 
             if (!preg_match('/^\d{9}$/', $num_utente)) {
-                header('Location: pacientes.php?erro=utente_invalido');
+                header('Location: pacientes?erro=utente_invalido');
                 exit;
             }
 
@@ -135,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edita
             $check->execute([$num_utente, $id]);
 
             if ($check->fetch()) {
-                header('Location: pacientes.php?erro=utente_existente');
+                header('Location: pacientes?erro=utente_existente');
                 exit;
             }
 
@@ -156,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edita
 
         registarLog($pdo, 'PACIENTE', 'UPDATE', $id, $id);
 
-        header('Location: pacientes.php?ok=edit');
+        header('Location: pacientes?ok=edit');
         exit;
     } catch (PDOException $e) {
         die($e->getMessage());
@@ -248,7 +246,7 @@ require_once 'includes/header.php';
                     <input type="text" name="q" placeholder="Pesquisar nome ou nº utente…" value="<?= htmlspecialchars($search) ?>">
                 </div>
                 <?php if ($search): ?>
-                    <a href="pacientes.php" class="btn btn-outline btn-icon" style="height:38px;width:38px;display:flex;align-items:center;justify-content:center">
+                    <a href="pacientes" class="btn btn-outline btn-icon" style="height:38px;width:38px;display:flex;align-items:center;justify-content:center">
                         <i class="ti ti-x"></i>
                     </a>
                 <?php endif; ?>
@@ -328,7 +326,7 @@ require_once 'includes/header.php';
                                         </button>
 
                                         <?php if ($funcao_atual === 'ti' && (int)$r['ativo'] === 1): ?>
-                                            <form method="post" action="pacientes.php" style="display:inline"
+                                            <form method="post" action="pacientes" style="display:inline"
                                                 onsubmit="return confirmarEliminacao(<?= json_encode($r['nome']) ?>)">
                                                 <input type="hidden" name="action" value="eliminar">
                                                 <input type="hidden" name="id_paciente" value="<?= (int)$r['id_paciente'] ?>">
@@ -363,7 +361,7 @@ require_once 'includes/header.php';
                 <span class="modal-title"><i class="ti ti-plus" style="margin-right:8px"></i>Novo Paciente</span>
                 <button class="btn btn-outline btn-icon" onclick="closeModal('modal-novo')"><i class="ti ti-x"></i></button>
             </div>
-            <form method="post" action="pacientes.php">
+            <form method="post" action="pacientes">
                 <input type="hidden" name="action" value="novo">
                 <div class="modal-body">
                     <div class="form-grid form-grid-1">
@@ -403,7 +401,7 @@ require_once 'includes/header.php';
                 <span class="modal-title"><i class="ti ti-pencil" style="margin-right:8px"></i>Editar Paciente</span>
                 <button class="btn btn-outline btn-icon" onclick="closeModal('modal-editar')"><i class="ti ti-x"></i></button>
             </div>
-            <form method="post" action="pacientes.php">
+            <form method="post" action="pacientes">
                 <input type="hidden" name="action" value="editar">
                 <input type="hidden" name="id" id="edit-id">
                 <div class="modal-body">
