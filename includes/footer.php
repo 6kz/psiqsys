@@ -100,21 +100,6 @@
 </head>
 
 <body>
-
-    <div class="layout">
-        <div class="main-content">
-            <div class="content-area">
-
-                <h1>Área de Trabalho</h1>
-                <p>O relógio e o controle de sessão estão ativos.</p>
-
-                <button class="btn btn-outline openModalBtnLogout">
-                    <i class="ti ti-logout"></i> Sair do Sistema
-                </button>
-
-            </div>
-        </div>
-    </div>
     <div class="modal-overlay" id="logoutModal">
         <div class="modal">
             <div class="modal-header">
