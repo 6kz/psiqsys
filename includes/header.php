@@ -86,7 +86,7 @@
             </div>
 
             <?php
-            require_once __DIR__ . '/auditoria.php';
+            require_once 'auditoria.php';
 
             // 2. Registar automaticamente o acesso de leitura (SELECT) à página atual
             if (isset($pdo) && isset($pagina_atual)) {
