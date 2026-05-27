@@ -2,7 +2,10 @@
 require_once 'includes/auth.php';
 require_once 'includes/db.php';
 
-require_once 'includes/db.php';
+// Determinar se o utilizador logado é administrativo
+// (Ajusta 'administrativo' e 'user_role' se a tua chave na sessão for diferente)
+$is_administrativo = (isset($_SESSION['currentFuncao']) && $_SESSION['currentFuncao'] === 'administrativo');
+
 $pagina_atual  = 'internamentos';
 $titulo_pagina = 'Internamentos';
 
@@ -18,10 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         // ── VERIFICAR SE A CAMA ESTÁ DISPONÍVEL ───────────────
         $checkCama = $pdo->prepare("
-        SELECT estado
-        FROM CAMA
-        WHERE id_cama = ?
-    ");
+            SELECT estado
+            FROM CAMA
+            WHERE id_cama = ?
+        ");
         $checkCama->execute([(int)$_POST['id_cama']]);
         $cama = $checkCama->fetch();
 
@@ -32,15 +35,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         // ── INSERIR INTERNAMENTO ───────────────────────────────
         $stmt = $pdo->prepare("
-        INSERT INTO INTERNAMENTO (
-            id_paciente,id_cama,data_admissao,motivo_internamento,
-            tipo_episodio,risco_suicidario,risco_agressividade,estado_clinico
-        )
-        VALUES (?,?,?,?,?,?,?,?)
-    ");
+            INSERT INTO INTERNAMENTO (
+                id_paciente,id_cama,data_admissao,motivo_internamento,
+                tipo_episodio,risco_suicidario,risco_agressividade,estado_clinico
+            )
+            VALUES (?,?,?,?,?,?,?,?)
+        ");
 
         try {
-
             $stmt->execute([
                 (int)$_POST['id_paciente'],
                 (int)$_POST['id_cama'],
@@ -59,24 +61,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             header('Location: internamentos.php?ok=novo');
             exit;
         } catch (PDOException $e) {
-
             // erro trigger cama ocupada
             if ($e->getCode() == '45000') {
                 header('Location: internamentos.php?erro=cama_ocupada');
                 exit;
             }
-
             // outros erros
             header('Location: internamentos.php?erro=geral');
             exit;
         }
-
-        // marca cama ocupada
-        $pdo->prepare("UPDATE CAMA SET estado='ocupada' WHERE id_cama=?")
-            ->execute([(int)$_POST['id_cama']]);
-
-        header('Location: internamentos.php?ok=novo');
-        exit;
     }
 }
 
@@ -119,26 +112,27 @@ require_once 'includes/header.php';
 <div class="content-area">
 
     <?php if (isset($_GET['ok'])): ?>
-        <?php if (isset($_GET['erro'])): ?>
-            <div class="alert alert-danger mb-4">
-                <i class="ti ti-alert-circle"></i>
-                <?php
-                switch ($_GET['erro']) {
-                    case 'cama_ocupada':
-                        echo 'A cama selecionada já se encontra ocupada.';
-                        break;
-                    case 'cama_indisponivel':
-                        echo 'A cama selecionada não está disponível.';
-                        break;
-                    default:
-                        echo 'Ocorreu um erro ao criar o internamento.';
-                }
-                ?>
-            </div>
-        <?php endif; ?>
         <div class="alert alert-success mb-4">
             <i class="ti ti-circle-check"></i>
             <?= $_GET['ok'] === 'alta' ? 'Alta clínica registada com sucesso.' : 'Internamento criado com sucesso.' ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['erro'])): ?>
+        <div class="alert alert-danger mb-4">
+            <i class="ti ti-alert-circle"></i>
+            <?php
+            switch ($_GET['erro']) {
+                case 'cama_ocupada':
+                    echo 'A cama selecionada já se encontra ocupada.';
+                    break;
+                case 'cama_indisponivel':
+                    echo 'A cama selecionada não está disponível.';
+                    break;
+                default:
+                    echo 'Ocorreu um erro ao criar o internamento.';
+            }
+            ?>
         </div>
     <?php endif; ?>
 
@@ -195,24 +189,58 @@ require_once 'includes/header.php';
                                 <div class="text-sm text-muted">Q<?= $r['numero_quarto'] ?> / C<?= $r['numero_cama'] ?></div>
                             </td>
                             <td class="mono text-sm"><?= date('d/m/Y H:i', strtotime($r['data_admissao'])) ?></td>
-                            <td><span class="badge badge-blue"><?= $r['tipo_episodio'] ?></span></td>
+
                             <td>
-                                <?php
-                                $rc = ['nenhum' => 'gray', 'baixo' => 'green', 'moderado' => 'amber', 'elevado' => 'red', 'iminente' => 'red'];
-                                echo '<span class="badge badge-' . ($rc[$r['risco_suicidario']] ?? 'gray') . '">' . $r['risco_suicidario'] . '</span>';
-                                ?>
+                                <?php if ($is_administrativo): ?>
+                                    <span class="confidential-blur">Oculto</span>
+                                <?php else: ?>
+                                    <div class="revealable-wrapper" onclick="toggleSensitiveData(this)">
+                                        <span class="confidential-placeholder">Oculto</span>
+                                        <span class="badge badge-blue confidential-content" style="display: none;"><?= htmlspecialchars($r['tipo_episodio']) ?></span>
+                                    </div>
+                                <?php endif; ?>
                             </td>
+
                             <td>
-                                <?php
-                                $ec = ['instavel' => 'red', 'estabilizando' => 'amber', 'estavel' => 'green', 'alta_prevista' => 'cyan'];
-                                echo '<span class="badge badge-' . ($ec[$r['estado_clinico']] ?? 'gray') . '">' . $r['estado_clinico'] . '</span>';
-                                ?>
+                                <?php if ($is_administrativo): ?>
+                                    <span class="confidential-blur">Oculto</span>
+                                <?php else: ?>
+                                    <div class="revealable-wrapper" onclick="toggleSensitiveData(this)">
+                                        <span class="confidential-placeholder">Oculto</span>
+                                        <div class="confidential-content" style="display: none;">
+                                            <?php
+                                            $rc = ['nenhum' => 'gray', 'baixo' => 'green', 'moderado' => 'amber', 'elevado' => 'red', 'iminente' => 'red'];
+                                            echo '<span class="badge badge-' . ($rc[$r['risco_suicidario']] ?? 'gray') . '">' . htmlspecialchars($r['risco_suicidario']) . '</span>';
+                                            ?>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
                             </td>
+
+                            <td>
+                                <?php if ($is_administrativo): ?>
+                                    <span class="confidential-blur">Oculto</span>
+                                <?php else: ?>
+                                    <div class="revealable-wrapper" onclick="toggleSensitiveData(this)">
+                                        <span class="confidential-placeholder">Oculto</span>
+                                        <div class="confidential-content" style="display: none;">
+                                            <?php
+                                            $ec = ['instavel' => 'red', 'estabilizando' => 'amber', 'estavel' => 'green', 'alta_prevista' => 'cyan'];
+                                            echo '<span class="badge badge-' . ($ec[$r['estado_clinico']] ?? 'gray') . '">' . htmlspecialchars($r['estado_clinico']) . '</span>';
+                                            ?>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            </td>
+
                             <td>
                                 <div class="flex gap-2">
-                                    <a href="internamento_detalhes.php?id=<?= $r['id_internamento'] ?>" class="btn btn-outline btn-sm">
-                                        <i class="ti ti-eye"></i>
-                                    </a>
+                                    <?php if (!$is_administrativo): ?>
+                                        <a href="internamento_detalhes.php?id=<?= $r['id_internamento'] ?>" class="btn btn-outline btn-sm">
+                                            <i class="ti ti-eye"></i>
+                                        </a>
+                                    <?php endif; ?>
+
                                     <?php if (is_null($r['data_alta'])): ?>
                                         <form method="post" onsubmit="return confirm('Confirmar alta clínica?')">
                                             <input type="hidden" name="action" value="alta">
@@ -235,8 +263,8 @@ require_once 'includes/header.php';
             </table>
         </div>
     </div>
-
 </div>
+
 <div class="modal-overlay" id="modal-novo">
     <div class="modal">
         <div class="modal-header">
@@ -329,11 +357,26 @@ require_once 'includes/header.php';
     function closeModal(id) {
         document.getElementById(id).classList.remove('open');
     }
+
     document.querySelectorAll('.modal-overlay').forEach(m => {
         m.addEventListener('click', e => {
             if (e.target === m) m.classList.remove('open');
         });
     });
+
+    // Função interativa para alternar a exibição de dados sensíveis (On/Off)
+    function toggleSensitiveData(element) {
+        const placeholder = element.querySelector('.confidential-placeholder');
+        const content = element.querySelector('.confidential-content');
+
+        if (content.style.display === 'none') {
+            content.style.display = 'inline-flex';
+            placeholder.style.display = 'none';
+        } else {
+            content.style.display = 'none';
+            placeholder.style.display = 'inline-flex';
+        }
+    }
 </script>
 
 <?php require_once 'includes/footer.php'; ?>
