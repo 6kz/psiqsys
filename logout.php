@@ -1,11 +1,16 @@
 <?php
-session_start();
 
-if (empty($_SESSION['currentID'])) {
-    header('refresh:3; url=index.php');
-    exit("Página indisponível para acesso.");
-} else {
-    session_destroy();
-    header('location:index.php');
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+session_unset();
+session_destroy();
+
+if (isset($_GET['timeout'])) {
+    header("Location: index.php?timeout=1");
     exit;
 }
+
+header("Location: index.php");
+exit;
