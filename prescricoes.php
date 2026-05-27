@@ -97,7 +97,7 @@ $internamentos_ativos = $pdo->query("
 ")->fetchAll();
 
 $medicacoes   = $pdo->query("SELECT * FROM MEDICACAO ORDER BY nome")->fetchAll();
-$profissionais = $pdo->query("SELECT id_profissional, nome, funcao FROM PROFISSIONAL WHERE funcao='medico' ORDx ER BY nome")->fetchAll();
+$profissionais = $pdo->query("SELECT id_profissional, nome, funcao FROM PROFISSIONAL WHERE funcao='medico' ORDER BY nome")->fetchAll();
 
 require_once 'includes/header.php';
 
