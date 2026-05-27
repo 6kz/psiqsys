@@ -57,6 +57,8 @@
                 <a href="eventos.php" class="nav-item <?= ($pagina_atual ?? '') === 'eventos' ? 'active' : '' ?>"><i class="ti ti-alert-triangle"></i> Eventos Críticos</a>
                 <div class="nav-group-label">Infraestrutura</div>
                 <a href="camas.php" class="nav-item <?= ($pagina_atual ?? '') === 'camas' ? 'active' : '' ?>"><i class="ti ti-building-hospital"></i> Camas & Quartos</a>
+                <div class="nav-group-label">Sistema</div>
+                <a href="camas.php" class="nav-item <?= ($pagina_atual ?? '') === 'auditoria' ? 'active' : '' ?>"><i class="ti ti-eye"></i>Registos Informáticos</a>
             </nav>
             <div class="sidebar-footer">
                 <i class="ti ti-user-circle" style="font-size:26px"></i>
@@ -101,6 +103,7 @@
                     'observacoes' => 'OBSERVACOES',
                     'camas' => 'CAMAS',
                     'administracoes' => 'ADMINISTRACAO_MEDICACOES',
+                    'auditoria' => 'AUDITORIA'
                 ];
 
                 $tabela_alvo = $tabelas_por_pagina[$pagina_atual] ?? 'SISTEMA';
