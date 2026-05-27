@@ -100,6 +100,7 @@
                     'eventos' => 'EVENTOS',
                     'observacoes' => 'OBSERVACOES',
                     'camas' => 'CAMAS',
+                    'administracoes' => 'ADMINISTRACAO_MEDICACOES',
                 ];
 
                 $tabela_alvo = $tabelas_por_pagina[$pagina_atual] ?? 'SISTEMA';
