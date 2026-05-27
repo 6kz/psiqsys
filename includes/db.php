@@ -5,7 +5,6 @@
  * Ajusta as credenciais abaixo conforme o teu ambiente.
  */
 
-<<<<<<< HEAD
 define('DB_NAME', 'bd_psiquiatria');
 define('DB_HOST', 'db');
 define('DB_USER', 'psiqsys_user');
