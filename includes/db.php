@@ -5,10 +5,10 @@
  * Ajusta as credenciais abaixo conforme o teu ambiente.
  */
 
-define('DB_HOST', 'localhost'); // db | localhost
 define('DB_NAME', 'bd_psiquiatria');
-define('DB_USER', 'root');       // psiqsys_user | root       ← altera para o teu utilizador MySQL   
-define('DB_PASS', '');           // user_password_secreta |     ← altera para a tua password MySQL    
+define('DB_HOST', 'db');
+define('DB_USER', 'psiqsys_user');
+define('DB_PASS', 'user_password_secreta');
 define('DB_CHARSET', 'utf8mb4');
 
 $dsn = sprintf(
