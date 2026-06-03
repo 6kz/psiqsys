@@ -48,15 +48,17 @@
             </div>
             <nav class="sidebar-nav">
                 <div class="nav-group-label">Geral</div>
-                <a href="dashboard.php" class="nav-item <?= ($pagina_atual ?? '') === 'dashboard' ? 'active' : '' ?>"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+                <a href="dashboard" class="nav-item <?= ($pagina_atual ?? '') === 'dashboard' ? 'active' : '' ?>"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
                 <div class="nav-group-label">Clínico</div>
-                <a href="pacientes.php" class="nav-item <?= ($pagina_atual ?? '') === 'pacientes' ? 'active' : '' ?>"><i class="ti ti-users"></i> Pacientes</a>
-                <a href="internamentos.php" class="nav-item <?= ($pagina_atual ?? '') === 'internamentos' ? 'active' : '' ?>"><i class="ti ti-bed"></i> Internamentos</a>
-                <a href="observacoes.php" class="nav-item <?= ($pagina_atual ?? '') === 'observacoes' ? 'active' : '' ?>"><i class="ti ti-clipboard-list"></i> Observações</a>
-                <a href="prescricoes.php" class="nav-item <?= ($pagina_atual ?? '') === 'prescricoes' ? 'active' : '' ?>"><i class="ti ti-pill"></i> Prescrições</a>
-                <a href="eventos.php" class="nav-item <?= ($pagina_atual ?? '') === 'eventos' ? 'active' : '' ?>"><i class="ti ti-alert-triangle"></i> Eventos Críticos</a>
+                <a href="pacientes" class="nav-item <?= ($pagina_atual ?? '') === 'pacientes' ? 'active' : '' ?>"><i class="ti ti-users"></i> Pacientes</a>
+                <a href="internamentos" class="nav-item <?= ($pagina_atual ?? '') === 'internamentos' ? 'active' : '' ?>"><i class="ti ti-bed"></i> Internamentos</a>
+                <a href="observacoes" class="nav-item <?= ($pagina_atual ?? '') === 'observacoes' ? 'active' : '' ?>"><i class="ti ti-clipboard-list"></i> Observações</a>
+                <a href="prescricoes" class="nav-item <?= ($pagina_atual ?? '') === 'prescricoes' ? 'active' : '' ?>"><i class="ti ti-pill"></i> Prescrições</a>
+                <a href="eventos" class="nav-item <?= ($pagina_atual ?? '') === 'eventos' ? 'active' : '' ?>"><i class="ti ti-alert-triangle"></i> Eventos Críticos</a>
                 <div class="nav-group-label">Infraestrutura</div>
-                <a href="camas.php" class="nav-item <?= ($pagina_atual ?? '') === 'camas' ? 'active' : '' ?>"><i class="ti ti-building-hospital"></i> Camas & Quartos</a>
+                <a href="camas" class="nav-item <?= ($pagina_atual ?? '') === 'camas' ? 'active' : '' ?>"><i class="ti ti-building-hospital"></i> Camas & Quartos</a>
+                <div class="nav-group-label">Sistema</div>
+                <a href="auditoria" class="nav-item <?= ($pagina_atual ?? '') === 'auditoria' ? 'active' : '' ?>"><i class="ti ti-eye"></i>Registos Informáticos</a>
             </nav>
             <div class="sidebar-footer">
                 <i class="ti ti-user-circle" style="font-size:26px"></i>
@@ -86,7 +88,7 @@
             </div>
 
             <?php
-            require_once __DIR__ . '/auditoria.php';
+            require_once __DIR__ . '/logger.php';
 
             // 2. Registar automaticamente o acesso de leitura (SELECT) à página atual
             if (isset($pdo) && isset($pagina_atual)) {
@@ -100,6 +102,8 @@
                     'eventos' => 'EVENTOS',
                     'observacoes' => 'OBSERVACOES',
                     'camas' => 'CAMAS',
+                    'administracoes' => 'ADMINISTRACAO_MEDICACOES',
+                    'auditoria' => 'AUDITORIA'
                 ];
 
                 $tabela_alvo = $tabelas_por_pagina[$pagina_atual] ?? 'SISTEMA';

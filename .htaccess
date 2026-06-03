@@ -1,0 +1,17 @@
+RewriteEngine on
+
+# 1. Correção do Erro 404 Dinâmico
+ErrorDocument 404 /run/psiqsys/404.php
+
+# 2. Impede que o Apache tente aplicar regras de reescrita à própria página 404
+RewriteRule ^404\.php$ - [L]
+
+# 3. Encaminhamento para ficheiros .html (se existirem)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^(.*)$ $1.html [NC,L]
+
+# 4. Encaminhamento para ficheiros .php (se existirem)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [NC,L]

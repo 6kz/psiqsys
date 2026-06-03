@@ -32,7 +32,7 @@ try {
     http_response_code(503);
     die('<div style="font-family:sans-serif;padding:40px;color:#dc2626">
         <h2>⚠️ Serviço indisponível</h2>
-        <p>Não foi possível ligar à base de dados. Verifica as credenciais em <code>includes/db.php</code>.</p>
+        <p>Não foi possível ligar à base de dados. Verifica as credenciais em <code>includes/db</code>.</p>
         <p style="font-size:.85rem;color:#6b7280">Erro: ' . htmlspecialchars($e->getMessage()) . '</p>
     </div>');
 }

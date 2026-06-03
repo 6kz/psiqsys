@@ -12,7 +12,7 @@ header("Pragma: no-cache");
 if (!isset($_SESSION['currentID']) || !isset($_SESSION['currentLogin'])) {
     session_unset();
     session_destroy();
-    header("Location: index.php");
+    header("Location: index");
     exit;
 }
 
@@ -22,7 +22,7 @@ if (isset($_SESSION['LAST_ACTIVITY'])) {
     if ($tempo_inativo > $tempo_limite) {
         session_unset();
         session_destroy();
-        header("Location: index.php");
+        header("Location: index");
         exit;
     }
 }
