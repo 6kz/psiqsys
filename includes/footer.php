@@ -40,7 +40,7 @@
         function atualizarRelogio() {
             // Se tiver um elemento de relógio na tela, você pode atualizar o texto dele aqui
             // Exemplo: document.getElementById('seu-relogio').innerText = new Date().toLocaleTimeString();
-            console.log("Relógio atualizado: " + new Date().toLocaleTimeString());
+            // console.log("Relógio atualizado: " + new Date().toLocaleTimeString());
         }
 
         // Inicializa o relógio se a função existir
