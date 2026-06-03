@@ -9,7 +9,8 @@ $is_admin = (isset($_SESSION['currentFuncao']) && ($_SESSION['currentFuncao'] ==
 
 if (!$is_admin) {
     header('HTTP/1.1 403 Forbidden');
-    echo "<div style='padding:40px; font-family:sans-serif; text-align:center;'><h2>Acesso Negado</h2><p>Não tem permissões para visualizar os logs de auditoria.</p></div>";
+    echo "<div style='padding:40px; font-family:sans-serif; text-align:center;'><h2>Acesso Negado</h2><p>Não tem permissões para visualizar as logs de auditoria.</p></div>";
+    header('refresh:3; url=index');
     exit;
 }
 
