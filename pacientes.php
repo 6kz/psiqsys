@@ -6,7 +6,9 @@ require_once 'includes/logger.php';
 $pagina_atual  = 'pacientes';
 $titulo_pagina = 'Pacientes';
 
+// Captura a função e normaliza para evitar quebras se vier 'administrative'
 $funcao_atual = $_SESSION['currentFuncao'] ?? '';
+$pode_aceder_modais = in_array($funcao_atual, ['ti', 'administrativo']);
 
 /* =========================================================
    DESATIVAR PACIENTE (Soft Delete)
@@ -53,8 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'elimi
    NOVO PACIENTE
 ========================================================= */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'novo') {
-    // Apenas TI e Administrativos podem criar
-    if ($funcao_atual !== 'ti' && $funcao_atual !== 'administrativo') {
+    if (!$pode_aceder_modais) {
         header('Location: pacientes?erro=sem_permissao');
         exit;
     }
@@ -104,8 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'novo'
    EDITAR PACIENTE
 ========================================================= */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'editar') {
-    // Apenas TI e Administrativos podem editar
-    if ($funcao_atual !== 'ti' && $funcao_atual !== 'administrativo') {
+    if (!$pode_aceder_modais) {
         header('Location: pacientes?erro=sem_permissao');
         exit;
     }
@@ -253,8 +253,8 @@ require_once 'includes/header.php';
             </form>
         </div>
 
-        <?php if ($funcao_atual === 'ti' || $funcao_atual === 'administrative' || $funcao_atual === 'administrativo'): ?>
-            <button class="btn btn-primary btn-sm" onclick="openModal('modal-novo')">
+        <?php if ($pode_aceder_modais): ?>
+            <button type="button" class="btn btn-primary btn-sm" onclick="openModal('modal-novo')">
                 <i class="ti ti-plus"></i> Novo Paciente
             </button>
         <?php endif; ?>
@@ -277,7 +277,7 @@ require_once 'includes/header.php';
                         <th>Contacto</th>
                         <th>Internamentos</th>
                         <th>Estado</th>
-                        <?php if ($funcao_atual === 'ti' || $funcao_atual === 'administrative' || $funcao_atual === 'administrativo'): ?>
+                        <?php if ($pode_aceder_modais): ?>
                             <th>Ações</th>
                         <?php endif; ?>
                     </tr>
@@ -310,7 +310,7 @@ require_once 'includes/header.php';
                                     <span class="badge badge-green">Ambulatório</span>
                                 <?php endif; ?>
                             </td>
-                            <?php if ($funcao_atual === 'ti' || $funcao_atual === 'administrative' || $funcao_atual === 'administrativo'): ?>
+                            <?php if ($pode_aceder_modais): ?>
                                 <td>
                                     <div class="flex gap-2">
                                         <button type="button" class="btn btn-outline btn-icon btn-sm"
@@ -342,7 +342,7 @@ require_once 'includes/header.php';
                     <?php endforeach; ?>
                     <?php if (empty($rows)): ?>
                         <tr>
-                            <td colspan="<?= ($funcao_atual === 'ti' || $funcao_atual === 'administrative' || $funcao_atual === 'administrativo') ? '8' : '7' ?>" class="text-muted text-sm" style="text-align:center;padding:32px">
+                            <td colspan="<?= ($pode_aceder_modais) ? '8' : '7' ?>" class="text-muted text-sm" style="text-align:center;padding:32px">
                                 <i class="ti ti-mood-empty" style="font-size:32px;display:block;margin-bottom:8px;color:var(--text-muted)"></i>
                                 Nenhum paciente encontrado
                             </td>
@@ -352,105 +352,108 @@ require_once 'includes/header.php';
             </table>
         </div>
     </div>
+
+    <?php if ($pode_aceder_modais): ?>
+        <div class="modal-overlay" id="modal-novo">
+            <div class="modal" style="max-width:540px">
+                <div class="modal-header">
+                    <span class="modal-title"><i class="ti ti-plus" style="margin-right:8px"></i>Novo Paciente</span>
+                    <button class="btn btn-outline btn-icon" type="button" onclick="closeModal('modal-novo')"><i class="ti ti-x"></i></button>
+                </div>
+                <form method="post" action="pacientes">
+                    <input type="hidden" name="action" value="novo">
+                    <div class="modal-body">
+                        <div class="form-grid form-grid-1">
+                            <div class="form-group">
+                                <label class="form-label">Nome Completo *</label>
+                                <input type="text" name="nome" class="form-control" required placeholder="Ex: Maria Silva">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Nº de Utente (SNS) *</label>
+                                <input type="text" name="num_utente" class="form-control" required pattern="\d{9}" title="O número de utente deve ter exatamente 9 dígitos" placeholder="Ex: 123456789">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Data de Nascimento *</label>
+                                <input type="date" name="data_nascimento" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Contacto Telefónico</label>
+                                <input type="text" name="contacto" class="form-control" placeholder="Ex: 912345678">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Morada</label>
+                                <textarea name="morada" class="form-control" placeholder="Ex: Rua Principal, nº 10" style="min-height:70px"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('modal-novo')">Cancelar</button>
+                        <button type="submit" class="btn btn-primary"><i class="ti ti-device-floppy"></i> Criar Paciente</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-editar" >
+            <div class="modal" style="max-width:540px">
+                <div class="modal-header">
+                    <span class="modal-title"><i class="ti ti-pencil" style="margin-right:8px"></i>Editar Paciente</span>
+                    <button class="btn btn-outline btn-icon" type="button" onclick="closeModal('modal-editar')"><i class="ti ti-x"></i></button>
+                </div>
+                <form method="post" action="pacientes" onsubmit="enviarEditar(this)">
+                    <input type="hidden" name="action" value="editar">
+                    <input type="hidden" name="id" id="edit-id">
+                    <div class="modal-body">
+                        <div class="form-grid form-grid-1">
+                            <div class="form-group">
+                                <label class="form-label">Nome</label>
+                                <input type="text" name="nome" id="edit-nome" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Nº de Utente (SNS)</label>
+                                <input type="text" name="num_utente" id="edit-utente" class="form-control" required pattern="\d{9}" title="O número de utente deve ter exatamente 9 dígitos" <?= ($funcao_atual === 'ti') ? '' : 'disabled style="background:var(--border);color:var(--text-muted);cursor:not-allowed;"' ?>>
+                                <?php if ($funcao_atual !== 'ti'): ?>
+                                    <small class="text-muted text-sm" style="display:block;margin-top:4px;">Apenas utilizadores de TI podem editar este campo.</small>
+                                <?php endif; ?>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Data de Nascimento</label>
+                                <input type="date" name="data_nascimento" id="edit-data" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Contacto</label>
+                                <input type="text" name="contacto" id="edit-contacto" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Morada</label>
+                                <textarea name="morada" id="edit-morada" class="form-control" style="min-height:70px"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('modal-editar')">Cancelar</button>
+                        <button type="submit" class="btn btn-primary"><i class="ti ti-device-floppy"></i> Guardar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    <?php endif; ?>
+
 </div>
-
-<?php if ($funcao_atual === 'ti' || $funcao_atual === 'administrative' || $funcao_atual === 'administrativo'): ?>
-    <div class="modal-overlay" id="modal-novo" style="display: none;">
-        <div class="modal" style="max-width:540px">
-            <div class="modal-header">
-                <span class="modal-title"><i class="ti ti-plus" style="margin-right:8px"></i>Novo Paciente</span>
-                <button class="btn btn-outline btn-icon" onclick="closeModal('modal-novo')"><i class="ti ti-x"></i></button>
-            </div>
-            <form method="post" action="pacientes">
-                <input type="hidden" name="action" value="novo">
-                <div class="modal-body">
-                    <div class="form-grid form-grid-1">
-                        <div class="form-group">
-                            <label class="form-label">Nome Completo *</label>
-                            <input type="text" name="nome" class="form-control" required placeholder="Ex: Maria Silva">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Nº de Utente (SNS) *</label>
-                            <input type="text" name="num_utente" class="form-control" required pattern="\d{9}" title="O número de utente deve ter exatamente 9 dígitos" placeholder="Ex: 123456789">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Data de Nascimento *</label>
-                            <input type="date" name="data_nascimento" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Contacto Telefónico</label>
-                            <input type="text" name="contacto" class="form-control" placeholder="Ex: 912345678">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Morada</label>
-                            <textarea name="morada" class="form-control" placeholder="Ex: Rua Principal, nº 10" style="min-height:70px"></textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" onclick="closeModal('modal-novo')">Cancelar</button>
-                    <button type="submit" class="btn btn-primary"><i class="ti ti-device-floppy"></i> Criar Paciente</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="modal-editar" style="display: none;">
-        <div class="modal" style="max-width:540px">
-            <div class="modal-header">
-                <span class="modal-title"><i class="ti ti-pencil" style="margin-right:8px"></i>Editar Paciente</span>
-                <button class="btn btn-outline btn-icon" onclick="closeModal('modal-editar')"><i class="ti ti-x"></i></button>
-            </div>
-            <form method="post" action="pacientes">
-                <input type="hidden" name="action" value="editar">
-                <input type="hidden" name="id" id="edit-id">
-                <div class="modal-body">
-                    <div class="form-grid form-grid-1">
-                        <div class="form-group">
-                            <label class="form-label">Nome</label>
-                            <input type="text" name="nome" id="edit-nome" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Nº de Utente (SNS)</label>
-                            <input type="text" name="num_utente" id="edit-utente" class="form-control" required pattern="\d{9}" title="O número de utente deve ter exatamente 9 dígitos" <?= ($funcao_atual === 'ti') ? '' : 'disabled style="background:var(--border);color:var(--text-muted);cursor:not-allowed;"' ?>>
-                            <?php if ($funcao_atual !== 'ti'): ?>
-                                <small class="text-muted text-sm" style="display:block;margin-top:4px;">Apenas utilizadores de TI podem editar este campo.</small>
-                            <?php endif; ?>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Data de Nascimento</label>
-                            <input type="date" name="data_nascimento" id="edit-data" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Contacto</label>
-                            <input type="text" name="contacto" id="edit-contacto" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Morada</label>
-                            <textarea name="morada" id="edit-morada" class="form-control" style="min-height:70px"></textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" onclick="closeModal('modal-editar')">Cancelar</button>
-                    <button type="submit" class="btn btn-primary"><i class="ti ti-device-floppy"></i> Guardar Alterações</button>
-                </div>
-            </form>
-        </div>
-    </div>
-<?php endif; ?>
-
 <script>
     function openModal(id) {
+        console.log("A tentar abrir o modal com ID:", id);
         var overlay = document.getElementById(id);
-        if (!overlay) return;
+        if (!overlay) {
+            console.error("ERRO: Não foi encontrado nenhum elemento com o ID '" + id + "' no HTML.");
+            return;
+        }
         overlay.style.display = "flex";
         setTimeout(function() {
             overlay.classList.add('open');
         }, 10);
     }
 
-    // Só regista funções JS globais se os elementos existirem
     function closeModal(id) {
         var overlay = document.getElementById(id);
         if (!overlay) return;
@@ -463,16 +466,36 @@ require_once 'includes/header.php';
     }
 
     function abrirEditar(id, nome, numUtente, data, contacto, morada) {
+        console.log("A abrir modo editar para o ID do paciente:", id);
+
         const elId = document.getElementById('edit-id');
-        if (!elId) return;
-        elId.value = id;
-        document.getElementById('edit-nome').value = nome;
+        const elNome = document.getElementById('edit-nome');
         const elUtente = document.getElementById('edit-utente');
+        const elData = document.getElementById('edit-data');
+        const elContacto = document.getElementById('edit-contacto');
+        const elMorada = document.getElementById('edit-morada');
+
+        if (!elId || !elNome || !elData) {
+            console.error("ERRO: Faltam campos estruturais no modal de edição (edit-id, edit-nome ou edit-data).");
+            return;
+        }
+
+        elId.value = id;
+        elNome.value = nome;
         if (elUtente) elUtente.value = numUtente;
-        document.getElementById('edit-data').value = data;
-        document.getElementById('edit-contacto').value = contacto;
-        document.getElementById('edit-morada').value = morada;
+        elData.value = data;
+        if (elContacto) elContacto.value = contacto;
+        if (elMorada) elMorada.value = morada;
+
         openModal('modal-editar');
+    }
+
+    function enviarEditar(form) {
+        const elUtente = document.getElementById('edit-utente');
+        if (elUtente && elUtente.disabled) {
+            elUtente.disabled = false;
+        }
+        return true;
     }
 
     function confirmarEliminacao(nomePaciente) {
