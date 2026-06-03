@@ -5,10 +5,10 @@
  * Ajusta as credenciais abaixo conforme o teu ambiente.
  */
 
-define('DB_HOST', 'db'); // db
 define('DB_NAME', 'bd_psiquiatria');
-define('DB_USER', 'psiqsys_user');       // psiqsys_user      ← altera para o teu utilizador MySQL   
-define('DB_PASS', 'user_password_secreta');           // user_password_secreta     ← altera para a tua password MySQL    
+define('DB_HOST', 'db');
+define('DB_USER', 'psiqsys_user');
+define('DB_PASS', 'user_password_secreta');
 define('DB_CHARSET', 'utf8mb4');
 
 $dsn = sprintf(
@@ -32,7 +32,7 @@ try {
     http_response_code(503);
     die('<div style="font-family:sans-serif;padding:40px;color:#dc2626">
         <h2>⚠️ Serviço indisponível</h2>
-        <p>Não foi possível ligar à base de dados. Verifica as credenciais em <code>includes/db.php</code>.</p>
+        <p>Não foi possível ligar à base de dados. Verifica as credenciais em <code>includes/db</code>.</p>
         <p style="font-size:.85rem;color:#6b7280">Erro: ' . htmlspecialchars($e->getMessage()) . '</p>
     </div>');
 }
