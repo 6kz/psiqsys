@@ -5,7 +5,11 @@
 // Generate a secure Bcrypt hash
 //  $hash = password_hash($password, PASSWORD_BCRYPT);
 //  echo $hash;
+
 session_start();
+session_destroy();
+session_start();
+
 require_once 'includes/db.php';
 
 $erro = '';

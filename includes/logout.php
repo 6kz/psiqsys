@@ -2,6 +2,7 @@
 session_start();
 
 if (empty($_SESSION['currentID'])) {
+    session_destroy();
     header('refresh:3; url=../index');
     exit("Página indisponível para acesso.");
 } else {
