@@ -3,7 +3,6 @@ require_once 'includes/auth.php';
 require_once 'includes/db.php';
 require_once 'includes/logger.php';
 
-require_once 'includes/db';
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) {
     header('Location: internamentos');
