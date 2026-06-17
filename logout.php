@@ -8,9 +8,9 @@ session_unset();
 session_destroy();
 
 if (isset($_GET['timeout'])) {
-    header("Location: index.php?timeout=1");
+    header("Location: index?timeout=1");
     exit;
 }
 
-header("Location: index.php");
+header("Location: index");
 exit;

@@ -27,7 +27,7 @@
                     Cancelar
                 </button>
 
-                <a href="includes/logout.php" class="btn btn-danger">
+                <a href="includes/logout" class="btn btn-danger">
                     <i class="ti ti-power"></i>
                     Sair
                 </a>
@@ -40,7 +40,7 @@
         function atualizarRelogio() {
             // Se tiver um elemento de relógio na tela, você pode atualizar o texto dele aqui
             // Exemplo: document.getElementById('seu-relogio').innerText = new Date().toLocaleTimeString();
-            console.log("Relógio atualizado: " + new Date().toLocaleTimeString());
+            // console.log("Relógio atualizado: " + new Date().toLocaleTimeString());
         }
 
         // Inicializa o relógio se a função existir
@@ -112,7 +112,7 @@
 
             // redireciona para o arquivo correto de logout para destruir a sessão no servidor
             setTimeout(() => {
-                window.location.href = 'includes/logout.php?timeout=1';
+                window.location.href = 'includes/logout?timeout=1';
             }, 1500);
 
         }, SESSION_TIMEOUT);

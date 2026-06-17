@@ -1,9 +1,10 @@
 <?php
 require_once 'includes/auth.php';
 require_once 'includes/db.php';
+require_once 'includes/logger.php';
 
 if (isset($_SESSION['currentFuncao']) && ($_SESSION['currentFuncao'] === 'administrativo' || $_SESSION['currentFuncao'] === 'administrative')) {
-    header('Location: pacientes.php?erro=sem_permissao');
+    header('Location: pacientes?erro=sem_permissao');
     exit;
 }
 
@@ -14,11 +15,10 @@ if (!isset($_SESSION['currentID']) || !isset($_SESSION['currentLogin'])) {
     session_destroy();
 
     // redireciona para login
-    header("Location: index.php");
+    header("Location: index");
     exit;
 }
 
-require_once 'includes/db.php';
 $pagina_atual  = 'dashboard';
 $titulo_pagina = 'Dashboard';
 require_once 'includes/header.php';
@@ -129,7 +129,7 @@ function humor_badge(string $h): string
         <div class="card">
             <div class="card-header">
                 <span class="card-title"><i class="ti ti-bed"></i> Internamentos Ativos</span>
-                <a href="internamentos.php" class="btn btn-outline btn-sm">Ver todos</a>
+                <a href="internamentos" class="btn btn-outline btn-sm">Ver todos</a>
             </div>
             <div class="table-wrap">
                 <table>
@@ -173,7 +173,7 @@ function humor_badge(string $h): string
         <div class="card">
             <div class="card-header">
                 <span class="card-title"><i class="ti ti-clipboard-list"></i> Últimas Observações</span>
-                <a href="observacoes.php" class="btn btn-outline btn-sm">Ver todas</a>
+                <a href="observacoes" class="btn btn-outline btn-sm">Ver todas</a>
             </div>
             <div class="table-wrap">
                 <table>
