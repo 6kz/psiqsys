@@ -8,7 +8,6 @@ if (isset($_SESSION['currentFuncao']) && ($_SESSION['currentFuncao'] === 'admini
     exit;
 }
 
-require_once 'includes/db.php';
 $pagina_atual  = 'eventos';
 $titulo_pagina = 'Eventos Críticos';
 
@@ -66,7 +65,7 @@ $rows = $pdo->prepare("
            p.nome AS paciente,
            prof.nome AS profissional
     FROM EVENTO_CRITICO e
-    JOIN INTERNAMENTO i   ON i.id_internamento    = e.id_internamento
+    JOIN INTERNAMENTO i   ON i.id_internamento     = e.id_internamento
     JOIN PACIENTE p       ON p.id_paciente         = i.id_paciente
     JOIN PROFISSIONAL prof ON prof.id_profissional = e.id_profissional
     WHERE $where
@@ -95,17 +94,17 @@ function gravidade_badge(string $g): string
 {
     $map = ['baixa' => 'green', 'moderada' => 'amber', 'elevada' => 'red', 'critica' => 'red'];
     $extra = $g === 'critica' ? ' style="animation:pulse 1s infinite"' : '';
-    return '<span class="badge badge-' . ($map[$g] ?? 'gray') . '"' . $extra . '>' . $g . '</span>';
+    return '<span class="badge badge-' . ($map[$g] ?? 'gray') . '"' . $extra . '>' . ucfirst($g) . '</span>';
 }
 
 $tipos_label = [
-    'autoagressao'    => 'Autoagressão',
-    'heteroagressao'  => 'Heteroagressão',
-    'fuga'            => 'Fuga',
-    'queda'           => 'Queda',
+    'autoagressao'     => 'Autoagressão',
+    'heteroagressao'   => 'Heteroagressão',
+    'fuga'             => 'Fuga',
+    'queda'            => 'Queda',
     'crise_convulsiva' => 'Crise Convulsiva',
     'recusa_alimentar' => 'Recusa Alimentar',
-    'outro'           => 'Outro',
+    'outro'            => 'Outro',
 ];
 ?>
 
@@ -181,7 +180,7 @@ $tipos_label = [
 
         <div class="card">
             <div class="card-header">
-                <span class="card-title" style="color:var(--danger)"><i class="ti ti-alert-triangle"></i> Eventos Críticos</span>
+                <span class="card-title" style="color:var(--danger)"><i class="ti ti-alert-triangle"></i> Histórico de Ocorrências</span>
                 <span class="text-sm text-muted"><?= count($rows) ?> registos</span>
             </div>
             <div class="table-wrap">
@@ -190,11 +189,10 @@ $tipos_label = [
                         <tr>
                             <th>Data/Hora</th>
                             <th>Paciente</th>
-                            <th>Tipo</th>
+                            <th>Tipo de Evento</th>
                             <th>Gravidade</th>
                             <th>Profissional</th>
-                            <th>Descrição</th>
-                            <th>Intervenção</th>
+                            <th style="text-align:right">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -202,33 +200,36 @@ $tipos_label = [
                             <tr>
                                 <td class="mono text-sm"><?= date('d/m/Y H:i', strtotime($r['data_hora'])) ?></td>
                                 <td>
-                                    <a href="internamento_detalhe?id=<?= $r['id_internamento'] ?>" class="fw-600">
-                                        <?= htmlspecialchars($r['paciente']) ?>
-                                    </a>
+                                    <div class="revealable-wrapper" onclick="toggleSensitiveData(this)">
+                                        <span class="confidential-placeholder">[CONFIDENCIAL]</span>
+                                        <span class="confidential-content" style="display: none;">
+                                            <a href="internamento_detalhes?id=<?= $r['id_internamento'] ?>" class="fw-600">
+                                                <?= htmlspecialchars($r['paciente']) ?>
+                                            </a>
+                                        </span>
+                                        <i class="ti ti-eye text-muted text-xs ms-1"></i>
+                                    </div>
                                     <div class="text-sm text-muted">Int. #<?= $r['id_internamento'] ?></div>
                                 </td>
                                 <td>
-                                    <span class="badge badge-red">
-                                        <?= $tipos_label[$r['tipo_evento']] ?? $r['tipo_evento'] ?>
+                                    <span class="badge badge-gray" style="text-transform: capitalize;">
+                                        <?= htmlspecialchars($tipos_label[$r['tipo_evento']] ?? $r['tipo_evento']) ?>
                                     </span>
                                 </td>
-                                <td><?= gravidade_badge($r['gravidade']) ?></td>
-                                <td class="text-sm"><?= htmlspecialchars($r['profissional']) ?></td>
-                                <td class="text-sm" style="max-width:200px">
-                                    <span title="<?= htmlspecialchars($r['descricao']) ?>">
-                                        <?= htmlspecialchars(substr($r['descricao'], 0, 70)) ?><?= strlen($r['descricao']) > 70 ? '…' : '' ?>
-                                    </span>
+                                <td>
+                                    <?= gravidade_badge($r['gravidade']) ?>
                                 </td>
-                                <td class="text-sm" style="max-width:180px">
-                                    <span title="<?= htmlspecialchars($r['intervencao_realizada']) ?>">
-                                        <?= htmlspecialchars(substr($r['intervencao_realizada'], 0, 60)) ?><?= strlen($r['intervencao_realizada']) > 60 ? '…' : '' ?>
-                                    </span>
+                                <td class="text-sm text-muted"><?= htmlspecialchars($r['profissional']) ?></td>
+                                <td style="text-align:right">
+                                    <a href="evento_detalhe.php?id=<?php echo (int)$r['id_evento']; ?>" class="btn btn-outline btn-xs">
+                                        <i class="ti ti-file-text"></i> Detalhes
+                                    </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                         <?php if (empty($rows)): ?>
                             <tr>
-                                <td colspan="7" class="text-muted text-sm" style="text-align:center;padding:32px">
+                                <td colspan="6" class="text-muted text-sm" style="text-align:center;padding:32px">
                                     <i class="ti ti-mood-happy" style="font-size:32px;display:block;margin-bottom:8px;color:var(--success)"></i>
                                     Nenhum evento crítico registado
                                 </td>
@@ -271,6 +272,7 @@ $tipos_label = [
     </div>
 
 </div>
+
 <div class="modal-overlay" id="modal-novo" style="display: none;">
     <div class="modal" style="max-width:680px">
         <div class="modal-header">
@@ -344,12 +346,26 @@ $tipos_label = [
     </div>
 </div>
 
-
 <script>
+    function toggleSensitiveData(element) {
+        const placeholder = element.querySelector('.confidential-placeholder');
+        const content = element.querySelector('.confidential-content');
+        const icon = element.querySelector('i');
+
+        if (content.style.display === 'none') {
+            content.style.display = 'inline-flex';
+            placeholder.style.display = 'none';
+            if (icon) icon.classList.replace('ti-eye', 'ti-eye-off');
+        } else {
+            content.style.display = 'none';
+            placeholder.style.display = 'inline-flex';
+            if (icon) icon.classList.replace('ti-eye-off', 'ti-eye');
+        }
+    }
+
     function openModal(id) {
         var overlay = document.getElementById(id);
         if (!overlay) return;
-
         overlay.style.display = "flex";
         setTimeout(function() {
             overlay.classList.add('open');
@@ -359,7 +375,6 @@ $tipos_label = [
     function closeModal(id) {
         var overlay = document.getElementById(id);
         if (!overlay) return;
-
         overlay.classList.remove('open');
         setTimeout(function() {
             if (!overlay.classList.contains('open')) {
