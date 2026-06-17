@@ -288,7 +288,9 @@ require_once 'includes/header.php';
                             <td class="mono text-muted"><?= (int)$r['id_paciente'] ?></td>
                             <td>
                                 <div class="fw-600">
-                                    <?= htmlspecialchars($r['nome']) ?>
+                                    <a href="paciente_detalhe.php?id=<?= (int)$r['id_paciente'] ?>" class="patient-link">
+                                        <?= htmlspecialchars($r['nome']) ?>
+                                    </a>
                                     <?php if ((int)$r['ativo'] === 0): ?>
                                         <span class="text-xs text-muted fw-400" style="margin-left: 6px;">(Inativo)</span>
                                     <?php endif; ?>

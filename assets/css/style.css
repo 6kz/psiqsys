@@ -1870,6 +1870,7 @@ tr.row-dimmed .badge {
 
 .btn-admin-med:hover {
     opacity: .9;
+}
 /* ── Estilos de Ocultação Interativa de Dados Sensíveis ─────────────────── */
 .revealable-wrapper {
     cursor: pointer;
@@ -1906,3 +1907,5 @@ tr.row-dimmed .badge {
     cursor: not-allowed;
     opacity: 0.7;
 }
+
+

@@ -6,9 +6,9 @@
  */
 
 define('DB_NAME', 'bd_psiquiatria');
-define('DB_HOST', 'db');
-define('DB_USER', 'psiqsys_user');
-define('DB_PASS', 'user_password_secreta');
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '');
 define('DB_CHARSET', 'utf8mb4');
 
 $dsn = sprintf(
